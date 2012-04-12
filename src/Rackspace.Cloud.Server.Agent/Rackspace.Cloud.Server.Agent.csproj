@@ -72,6 +72,7 @@
     <Compile Include="Actions\Finalizer.cs" />
     <Compile Include="Actions\InjectFileMessageHandler.cs" />
     <Compile Include="Actions\Installer.cs" />
+    <Compile Include="Actions\IPFinder.cs" />
     <Compile Include="Actions\ServiceRestarter.cs" />
     <Compile Include="Actions\Sleeper.cs" />
     <Compile Include="Actions\ServiceStarter.cs" />
@@ -86,6 +87,8 @@
     <Compile Include="Commands\InjectFile.cs" />
     <Compile Include="Commands\UpdaterUpdate.cs" />
     <Compile Include="Commands\XentoolsUpdate.cs" />
+    <Compile Include="Configuration\Ipv4Tuple.cs" />
+    <Compile Include="Configuration\Ipv6Tuple.cs" />
     <Compile Include="DiffieHellmanPrerequisitesChecker.cs" />
     <Compile Include="Actions\SetNetworkRoutes.cs" />
     <Compile Include="FileInfo.cs" />
@@ -125,7 +128,6 @@
     <Compile Include="Interfaces\IExecutableProcessQueue.cs" />
     <Compile Include="CustomExceptions.cs" />
     <Compile Include="CommandQueue.cs" />
-    <Compile Include="Configuration\IpTuple.cs" />
     <Compile Include="Interfaces\ITimer.cs" />
     <Compile Include="Configuration\Network.cs" />
     <Compile Include="ProdTimer.cs" />

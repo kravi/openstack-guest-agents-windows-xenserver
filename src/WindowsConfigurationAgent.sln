@@ -8,7 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Artifacts", "Build Ar
 		..\Click To Build.bat = ..\Click To Build.bat
 		..\installagentservice.bat = ..\installagentservice.bat
 		..\installupdateservice.bat = ..\installupdateservice.bat
-		..\Properties.rb = ..\Properties.rb
 		..\rakefile.rb = ..\rakefile.rb
 		..\README.txt = ..\README.txt
 	EndProjectSection
