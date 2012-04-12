@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using NUnit.Framework;
 using Rackspace.Cloud.Server.Agent.Actions;
 using Rackspace.Cloud.Server.Agent.Configuration;
@@ -8,6 +9,7 @@ using Rackspace.Cloud.Server.Agent.Interfaces;
 using Rackspace.Cloud.Server.Agent.WMI;
 using Rackspace.Cloud.Server.Common.Logging;
 using Rhino.Mocks;
+using Rhino.Mocks.Constraints;
 
 namespace Rackspace.Cloud.Server.Agent.Specs {
     public class SetNetworkInterfaceSpecBase {
@@ -16,6 +18,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         protected IExecutableProcessQueue ExecutableProcessQueue;
         protected IWmiMacNetworkNameGetter WmiMacNetworkNameGetter;
         protected ILogger Logger;
+        protected IIPFinder _mockIPFinder;
 
         internal void Setup(string macAddress) {
             Setup(macAddress, false);
@@ -31,6 +34,9 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             ExecutableProcessQueue = MockRepository.GenerateMock<IExecutableProcessQueue>();
             ExecutableProcessQueue.Stub(x => x.Enqueue(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(
                 ExecutableProcessQueue);
+
+            _mockIPFinder = MockRepository.GenerateMock<IIPFinder>();
+            _mockIPFinder.Stub(x => x.findIpv6Addresses("Lan1")).Return(new List<IPAddress>());
 
             WmiMacNetworkNameGetter = MockRepository.GenerateMock<IWmiMacNetworkNameGetter>();
 
@@ -59,7 +65,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             var networkInterface = GetMeANetworkInterface(macAddress);
 
             var ipList = networkInterface.ips.ToList();
-            ipList.Add(new IpTuple {ip = "1.2.2.2", netmask = "255.255.0.0"});
+            ipList.Add(new Ipv4Tuple {ip = "1.2.2.2", netmask = "255.255.0.0"});
 
             networkInterface.ips = ipList.ToArray();
             return networkInterface;
@@ -68,14 +74,118 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         private NetworkInterface GetMeANetworkInterface(string macAddress) {
             return new NetworkInterface
                        {
-                           ips = new[] {new IpTuple {ip = "192.168.1.110", netmask = "255.255.255.0"}},
-                           ip6s = new[] {new IpTuple {ip = "2001:0DB8::0", netmask = "32"}},
+                           ips = new[] {new Ipv4Tuple {ip = "192.168.1.110", netmask = "255.255.255.0"}},
+                           ip6s = new Ipv6Tuple[]{},
                            dns = new[] {"192.168.1.3", "192.168.1.4"},
                            label = "Front End",
                            gateway = "192.168.1.1",
-                           gateway6 = "fe80::def",
                            mac = macAddress
                        };
+        }
+    }
+
+    [TestFixture]
+    public class SetNetWorkInterfacesForIpv6Addresses : SetNetworkInterfaceSpecBase
+    {
+        [SetUp]
+        public void Setup()
+        {
+            Setup("fakemac");
+            var ip6s = new[] { new Ipv6Tuple { enabled = "1", ip = "2001:4801:787F:202:278E:89D8:FF06:B476", netmask = "96", gateway = "fe80::def" } };
+            NetworkInterface = new NetworkInterfaceBuilder().withIp6s(ip6s).withMacAddress("fakemac").
+                                    withIps(new Ipv4Tuple[] { }).build();
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, _mockIPFinder);
+        }
+
+        [Test]
+        public void should_handle_ip6s()
+        {
+            SetNetworkInterface.Execute(new List<NetworkInterface> { NetworkInterface });
+            ExecutableProcessQueue.AssertWasCalled(
+                x =>
+                x.Enqueue("netsh",
+                          "interface ipv6 add address interface=\"Lan1\" address=2001:4801:787F:202:278E:89D8:FF06:B476/96"));
+            ExecutableProcessQueue.AssertWasCalled(
+                x =>
+                x.Enqueue("netsh",
+                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes"));
+        }
+
+        [Test]
+        public void should_handle_ip6s_being_null()
+        {
+            NetworkInterface.ip6s = null;
+            ExecutableProcessQueue.Expect(queue => queue.Enqueue(Arg<string>.Is.Equal("netsh"), Arg<string>.Is.Anything)).WhenCalled(ShouldNotHaveIpv6SubCommand).Repeat.Any().Return(null);
+            SetNetworkInterface.Execute(new List<NetworkInterface> { NetworkInterface });
+        }
+
+        private static void ShouldNotHaveIpv6SubCommand(MethodInvocation obj)
+        {
+            var subCommand = (string) obj.Arguments.Last();
+            Assert.IsFalse(subCommand.StartsWith("interface ipv6"));
+        }
+
+        [Test]
+        public void should_set_ipv6_addresses()
+        {
+            SetNetworkInterface.Execute(new List<NetworkInterface> { NetworkInterface });
+            ExecutableProcessQueue.AssertWasCalled(
+                x =>
+                x.Enqueue("netsh",
+                          "interface ipv6 add address interface=\"Lan1\" address=2001:4801:787F:202:278E:89D8:FF06:B476/96"));
+            ExecutableProcessQueue.AssertWasCalled(
+                x =>
+                x.Enqueue("netsh",
+                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes"));
+        }
+
+  
+        [Test]
+        public void should_reset_ipv6_address_and_route_before_setting_ipv6_addresses()
+        {
+            _mockIPFinder.findIpv6Addresses("Lan1").Add(IPAddress.Parse("2001:4801:787F:202:278E:89D8:FF06:B476"));
+            SetNetworkInterface.Execute(new List<NetworkInterface> {NetworkInterface});
+            ExecutableProcessQueue.AssertWasCalled(
+                x =>
+                x.Enqueue("netsh",
+                          "interface ipv6 delete address interface=\"Lan1\" address=2001:4801:787F:202:278E:89D8:FF06:B476"));
+
+
+            ExecutableProcessQueue.AssertWasCalled(
+                x => x.Enqueue("netsh", "interface ipv6 delete route ::/0 \"Lan1\"", new[] {"0", "1"}));
+        }
+    }
+
+    public class NetworkInterfaceBuilder
+    {
+        private NetworkInterface netWorkInterface;
+
+        public NetworkInterfaceBuilder()
+        {
+            this.netWorkInterface = new NetworkInterface();
+        }
+
+        public NetworkInterface build()
+        {
+            return this.netWorkInterface;
+        }
+
+        public NetworkInterfaceBuilder withIp6s(Ipv6Tuple[] ipv6Tuples)
+        {
+            this.netWorkInterface.ip6s = ipv6Tuples;
+            return this;
+        }
+
+        public NetworkInterfaceBuilder withMacAddress(string macAddress)
+        {
+            this.netWorkInterface.mac = macAddress;
+            return this;
+        }
+
+        public NetworkInterfaceBuilder withIps(Ipv4Tuple[] ipv4Tuples)
+        {
+            this.netWorkInterface.ips = ipv4Tuples;
+            return this;
         }
     }
 
@@ -86,7 +196,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             Setup("fakemac");
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Twice();
 
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
             SetNetworkInterface.Execute(new List<NetworkInterface>{NetworkInterface});
         }
 
@@ -144,7 +254,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             Setup("fakemac");
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Once();
 
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
         }
 
         [Test]
@@ -164,7 +274,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             Setup("fakemac", true);
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Once();
 
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
         }
 
         [Test]
@@ -199,7 +309,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             Setup("fakemac", false, false, true);
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Once();
 
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
             SetNetworkInterface.Execute(new List<NetworkInterface> { NetworkInterface });
         }
 
@@ -216,7 +326,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         public void Setup() {
             Setup("some_mac_not_found");
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Once();
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
         }
 
         [Test]
@@ -232,7 +342,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         public void Setup() {
             Setup("fakemac", true, true, false);
             ExecutableProcessQueue.Expect(x => x.Go()).Repeat.Once();
-            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger);
+            SetNetworkInterface = new SetNetworkInterface(ExecutableProcessQueue, WmiMacNetworkNameGetter, Logger, new IPFinder());
         }
 
         [Test]
