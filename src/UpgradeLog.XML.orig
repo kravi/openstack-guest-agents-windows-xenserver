@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
 <Properties><Property Name="Solution" Value="WindowsConfigurationAgent">
 </Property><Property Name="Solution File" Value="C:\workspace\openstack\openstack-guest-agents-windows-xenserver\src\WindowsConfigurationAgent.sln">
+<<<<<<< HEAD
+</Property><Property Name="Date" Value="Friday, July 13, 2012">
+</Property><Property Name="Time" Value="12:42 PM">
+=======
 </Property><Property Name="Date" Value="Wednesday, June 20, 2012">
 </Property><Property Name="Time" Value="8:14 AM">
+>>>>>>> 8a175c7... Upgrade to VS2010
 </Property></Properties><Event ErrorLevel="1" Project="Rackspace.Cloud.Server.Agent.Service" Source="Rackspace.Cloud.Server.Agent.Service\Rackspace.Cloud.Server.Agent.Service.csproj" Description="Your project is targeting .NET Framework 2.0 or 3.0. If your project uses assemblies requiring a newer .NET Framework, your project will fail to build. You can change the .NET Framework version by clicking Properties on the project menu and then selecting a new version in the '.NET Framework' dropdown box. (In Visual Basic, this is located on the Compile tab by clicking the 'Advanced Compiler Options...' button.)">
 </Event><Event ErrorLevel="0" Project="Rackspace.Cloud.Server.Agent.Service" Source="Rackspace.Cloud.Server.Agent.Service\Rackspace.Cloud.Server.Agent.Service.csproj" Description="Project converted successfully">
 </Event><Event ErrorLevel="3" Project="Rackspace.Cloud.Server.Agent.Service" Source="Rackspace.Cloud.Server.Agent.Service\Rackspace.Cloud.Server.Agent.Service.csproj" Description="Converted">

@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\ChecksumValidator.cs" />
+    <Compile Include="Actions\SetProviderData.cs" />
     <Compile Include="Actions\Downloader.cs" />
     <Compile Include="Actions\FileCopier.cs" />
     <Compile Include="Actions\FileCreator.cs" />
@@ -106,8 +107,11 @@
     <Compile Include="Commands\InjectFile.cs" />
     <Compile Include="Commands\UpdaterUpdate.cs" />
     <Compile Include="Commands\XentoolsUpdate.cs" />
+    <Compile Include="Configuration\ProviderData.cs" />
     <Compile Include="Configuration\Ipv4Tuple.cs" />
     <Compile Include="Configuration\Ipv6Tuple.cs" />
+    <Compile Include="Netsh\NetshFirewallRuleNameAvailable.cs" />
+    <Compile Include="XenProviderDataInformation.cs" />
     <Compile Include="DiffieHellmanPrerequisitesChecker.cs" />
     <Compile Include="Actions\SetNetworkRoutes.cs" />
     <Compile Include="FileInfo.cs" />
@@ -165,7 +169,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rackspace.Cloud.Server.Agent.DiffieHellman\Rackspace.Cloud.Server.DiffieHellman.csproj">
