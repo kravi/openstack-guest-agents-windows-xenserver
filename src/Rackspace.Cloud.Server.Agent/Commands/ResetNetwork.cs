@@ -18,26 +18,40 @@ using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
 using System.Linq;
 
-namespace Rackspace.Cloud.Server.Agent.Commands {
+namespace Rackspace.Cloud.Server.Agent.Commands
+{
     /// <summary>
     /// Do not change name unless the server team is changing the command name in xen store.
     /// </summary>
-    public class ResetNetwork : IExecutableCommand {
+    public class ResetNetwork : IExecutableCommand
+    {
         private readonly ISetNetworkInterface _setNetworkInterface;
         private readonly IXenNetworkInformation _xenNetworkInformation;
         private readonly ISetNetworkRoutes _setNetworkRoutes;
 
-        public ResetNetwork(ISetNetworkInterface setNetworkInterface, IXenNetworkInformation xenNetworkInformation, ISetNetworkRoutes setNetworkRoutes) {
+        private readonly ISetProviderData _setProviderData;
+        private readonly IXenProviderDataInformation _xenProviderDataInformation;
+
+        public ResetNetwork(ISetNetworkInterface setNetworkInterface, IXenNetworkInformation xenNetworkInformation, ISetNetworkRoutes setNetworkRoutes,
+            ISetProviderData setProviderData, IXenProviderDataInformation xenProviderDataInformation)
+        {
             _setNetworkInterface = setNetworkInterface;
             _xenNetworkInformation = xenNetworkInformation;
             _setNetworkRoutes = setNetworkRoutes;
+
+            _setProviderData = setProviderData;
+            _xenProviderDataInformation = xenProviderDataInformation;
         }
 
-        public ExecutableResult Execute(string keyValue) {
+        public ExecutableResult Execute(string keyValue)
+        {
             var network = _xenNetworkInformation.Get();
 
             _setNetworkInterface.Execute(network.Interfaces.Values.ToList());
             _setNetworkRoutes.Execute(network);
+
+            var providerData = _xenProviderDataInformation.Get();
+            _setProviderData.Execute(providerData);
 
             return new ExecutableResult();
         }

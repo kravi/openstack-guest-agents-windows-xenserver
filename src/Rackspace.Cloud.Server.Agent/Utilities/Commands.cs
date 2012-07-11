@@ -15,8 +15,10 @@
 
 using System;
 
-namespace Rackspace.Cloud.Server.Agent.Utilities {
-    public enum Commands {
+namespace Rackspace.Cloud.Server.Agent.Utilities
+{
+    public enum Commands
+    {
         version,
         password,
         ready,

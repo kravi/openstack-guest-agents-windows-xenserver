@@ -24,5 +24,6 @@ namespace Rackspace.Cloud.Server.Agent.Interfaces {
         IEnumerable<string> Read(string keylocation);
         string ReadKey(string s);
         string ReadVmDataKey(string key);
+        string ReadVmProviderDataKey(string key);
     }
 }

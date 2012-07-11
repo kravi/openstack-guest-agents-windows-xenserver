@@ -13,6 +13,8 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
+using Rackspace.Cloud.Server.Agent.Configuration;
+
 namespace Rackspace.Cloud.Server.Agent.Interfaces
 {
     public interface IExecutableProcessQueue {

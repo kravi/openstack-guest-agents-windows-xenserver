@@ -42,5 +42,11 @@ namespace Rackspace.Cloud.Server.Common.Configuration {
         public static string AgentVersionUpdatesPath {
             get { return ConfigurationManager.AppSettings["AgentVersionUpdatesPath"]; }
         }
+
+        public static string FirewallRoleNames
+        {
+            // This is a | separated values. This project is in .NET 2.0, did not want to parse this out here. Let the caller handle converting them into list.
+            get { return ConfigurationManager.AppSettings["FirewallRoleNames"]; }
+        }
     }
 }

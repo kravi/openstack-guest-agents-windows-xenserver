@@ -26,6 +26,13 @@ namespace Rackspace.Cloud.Server.Agent {
         public const string WritableDataHostBase = "data/host";
         public const string WritableDataGuestBase = "data/guest";
         public const string NetworkingBase = "networking";
+        public const string ProviderDataBase = "provider_data";
+        public const string Provider = "provider";
+        public const string Roles = "roles";
+        public const string Region = "region";
+        public const string IpWhiteList = "ip_whitelist";
+
+        public const string SoftwareFirewallRuleName = "RS_FIREWALL_RULE";
 
         public const string SuccessfulKeyInit = "D0";
 

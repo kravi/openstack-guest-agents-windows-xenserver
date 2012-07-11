@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using Rackspace.Cloud.Server.Agent.Configuration;
@@ -16,6 +17,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         private string _fullJsonStringWithObjectPartiallyPopulated;
         private string _fullInterfaceJsonString;
         private string _updateJson;
+        private Json<ProviderData> _jsonProviderData;
 
         [SetUp]
         public void Setup()
@@ -29,6 +31,8 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             _fullJsonStringWithObjectPartiallyPopulated = "{\"key\":null,\"name\":\"password\",\"value\":\"somepassword\"}";
 
             _fullInterfaceJsonString = "{\"mac\":\"40:40:ed:65:h6\",\"dns\":[\"1.1.1.1\",\"64.39.2.138\"],\"label\":\"Label 1\",\"ips\":[{\"Ip\":\"3.3.3.3\",\"NetMask\":\"255.255.255.0\"},{\"Ip\":\"4.4.4.4\",\"NetMask\":\"255.255.255.0\"}],\"gateway\":\"10.1.1.100\"}";
+
+            _jsonProviderData = new Json<ProviderData>();
         }
 
         [Test]
@@ -140,11 +144,6 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         [Test]
         public void should_remove_duplicate_dns_entries()
         {
-            const string stringWrong = "{\"mac\":\"40:40:92:9e:44:48\",\"dns\":[\"72.3.128.240\",\"72.3.128.241\"],\"label\":\"public\",\"ips\":[{\"ip\":\"98.129.220.138\",\"netmask\":\"255.255.255.0\"}],\"gateway\":\"98.129.220.1\",\"slice\":74532}";
-            const string stringCorrt = "{\"mac\":\"40:40:92:9e:44:48\",\"dns\":[\"72.3.128.240\",\"72.3.128.241\"],\"label\":\"public\",\"ips\":[{\"ip\":\"98.129.220.138\",\"netmask\":\"255.255.255.0\"}],\"gateway\":\"98.129.220.1\"}";
-            const string stringSomething =
-                "{\"label\": \"private\", \"ips\": [{\"netmask\": \"255.255.224.0\", \"ip\": \"10.176.64.48\"}], \"mac\": \"40:40:d0:ed:cb:96\"}";
-
             var interface1 = new NetworkInterface
             {
                 gateway = "98.129.220.1",
@@ -178,5 +177,69 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
                 "\"gateway\":\"98.129.220.1\",\"routes\":null}"));
 
         }
+
+        [Test]
+        public void should_serialize_complete_provider_data()
+        {
+            var providerData = new ProviderData()
+                                   {
+                                       provider = "TheDarkKnightRises",
+                                       region = "Gotham City",
+                                       ip_whitelist = new List<string>() {"0", "1"},
+                                       white_List_Ips = new List<string>() {"72.3.128.241", "72.3.128.241"},
+                                       roles = new List<string>() {"rav_connect", "rav_managed"}
+                                   };
+
+            var serialzed = _jsonProviderData.Serialize(providerData);
+            
+            Assert.That(serialzed, Is.EqualTo("{\"region\":\"Gotham City\",\"roles\":[\"rav_connect\",\"rav_managed\"],\"ip_whitelist\":[\"0\",\"1\"],\"provider\":\"TheDarkKnightRises\",\"white_List_Ips\":[\"72.3.128.241\",\"72.3.128.241\"]}"));
+        }
+
+        [Test]
+        public void should_serialize_partial_provider_data()
+        {
+            var providerData = new ProviderData()
+            {
+                provider = "TheDarkKnightRises",
+                region = "Gotham City",
+                ip_whitelist = new List<string>() { "" },
+                white_List_Ips = new List<string>() { },
+                roles = new List<string>() { "rav_connect", "rav_managed" }
+            };
+
+            var serialzed = _jsonProviderData.Serialize(providerData);
+
+            Assert.That(serialzed, Is.EqualTo("{\"region\":\"Gotham City\",\"roles\":[\"rav_connect\",\"rav_managed\"],\"ip_whitelist\":[\"\"],\"provider\":\"TheDarkKnightRises\",\"white_List_Ips\":[]}"));
+        }
+
+        [Test]
+        public void should_deserialize_complete_provider_data()
+        {
+            var stringProviderData =
+                "{\"region\":\"Gotham City\",\"roles\":[\"rav_connect\",\"rav_managed\"],\"ip_whitelist\":[\"0\",\"1\"],\"provider\":\"TheDarkKnightRises\",\"white_List_Ips\":[\"72.3.128.241\",\"72.3.128.241\"]}";
+
+            var deserialzed = _jsonProviderData.Deserialize(stringProviderData);
+            Assert.AreEqual("rav_connect", deserialzed.roles[0]);
+            Assert.AreEqual("Gotham City", deserialzed.region);
+            Assert.AreEqual("TheDarkKnightRises", deserialzed.provider);
+            Assert.IsTrue(deserialzed.ip_whitelist.Contains("0"));
+            Assert.IsTrue(deserialzed.white_List_Ips.Contains("72.3.128.241"));
+        }
+        [Test]
+
+        public void should_deserialize_partial_provider_data()
+        {
+            var stringProviderData =
+                "{\"region\":\"Gotham City\",\"roles\":[\"rav_connect\",\"rav_managed\"],\"ip_whitelist\":[\"\"],\"provider\":\"TheDarkKnightRises\",\"white_List_Ips\":[]}";
+
+            var deserialzed = _jsonProviderData.Deserialize(stringProviderData);
+            Assert.AreEqual("rav_connect", deserialzed.roles[0]);
+            Assert.AreEqual("Gotham City", deserialzed.region);
+            Assert.AreEqual("TheDarkKnightRises", deserialzed.provider);
+            Assert.AreEqual(string.Empty,deserialzed.ip_whitelist[0]);
+            Assert.IsEmpty(deserialzed.white_List_Ips);
+        }
+
+
     }
 }
