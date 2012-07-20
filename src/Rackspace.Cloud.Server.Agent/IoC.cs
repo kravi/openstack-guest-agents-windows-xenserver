@@ -16,6 +16,7 @@
 using Rackspace.Cloud.Server.Agent.Actions;
 using Rackspace.Cloud.Server.Agent.Commands;
 using Rackspace.Cloud.Server.Agent.Interfaces;
+using Rackspace.Cloud.Server.Agent.Netsh;
 using Rackspace.Cloud.Server.Agent.Utilities;
 using Rackspace.Cloud.Server.Agent.WMI;
 using Rackspace.Cloud.Server.Common.Logging;
@@ -44,6 +45,8 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IRegistryReader>().TheDefaultIsConcreteType<RegistryReader>();
             StructureMapConfiguration.BuildInstancesOf<IAdministratorAccountNameFinder>().TheDefaultIsConcreteType<AdministratorAccountNameFinder>();
             StructureMapConfiguration.BuildInstancesOf<ISystemInformation>().TheDefaultIsConcreteType<SystemInformation>();
+            StructureMapConfiguration.BuildInstancesOf<INetshFirewallRuleNameAvailable>().TheDefaultIsConcreteType<NetshFirewallRuleNameAvailable>();
+            StructureMapConfiguration.BuildInstancesOf<IXenProviderDataInformation>().TheDefaultIsConcreteType<XenProviderDataInformation>();
             
             //ACTIONS
             StructureMapConfiguration.BuildInstancesOf<IActivateWindowsUsingKms>().TheDefaultIsConcreteType<ActivateWindowsUsingKms>();
@@ -57,6 +60,9 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IInstaller>().TheDefaultIsConcreteType<Installer>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkInterface>().TheDefaultIsConcreteType<SetNetworkInterface>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkRoutes>().TheDefaultIsConcreteType<SetNetworkRoutes>();
+
+            StructureMapConfiguration.BuildInstancesOf<ISetProviderData>().TheDefaultIsConcreteType<SetProviderData>();
+
             StructureMapConfiguration.BuildInstancesOf<ISetPassword>().TheDefaultIsConcreteType<SetPassword>();
             StructureMapConfiguration.BuildInstancesOf<ISleeper>().TheDefaultIsConcreteType<Sleeper>();
             StructureMapConfiguration.BuildInstancesOf<IServiceRestarter>().TheDefaultIsConcreteType<ServiceRestarter>();
@@ -81,6 +87,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<Password>().WithName(Utilities.Commands.password.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<Ready>().WithName(Utilities.Commands.ready.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<ResetNetwork>().WithName(Utilities.Commands.resetnetwork.ToString());
+            //StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<ResetSoftwareFirewall>().WithName(Utilities.Commands.resetsoftwarefirewall.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<AgentUpdate>().WithName(Utilities.Commands.agentupdate.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<XentoolsUpdate>().WithName(Utilities.Commands.xentoolsupdate.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<KmsActivate>().WithName(Utilities.Commands.kmsactivate.ToString());

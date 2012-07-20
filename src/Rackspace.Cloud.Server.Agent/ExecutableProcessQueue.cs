@@ -15,6 +15,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
 using Rackspace.Cloud.Server.Common.Logging;
 

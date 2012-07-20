@@ -18,17 +18,29 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         private NetworkInterface networkInterface;
         private ISetNetworkRoutes setNetworkRoutes;
 
+        private ISetProviderData setProviderData;
+        private IXenProviderDataInformation xenProviderDataInformation;
+        private ProviderData providerData;
+
         [SetUp]
         public void Setup() {
             xenNetworkInformation = MockRepository.GenerateMock<IXenNetworkInformation>();
             setNetworkInterface = MockRepository.GenerateMock<ISetNetworkInterface>();
             setNetworkRoutes = MockRepository.GenerateMock<ISetNetworkRoutes>();
 
+            xenProviderDataInformation = MockRepository.GenerateMock<IXenProviderDataInformation>();
+            setProviderData = MockRepository.GenerateMock<ISetProviderData>();
+            
+
             networkInterface = new NetworkInterface();
             network = new Network();
             network.Interfaces.Add("fakemac", networkInterface);
-            command = new ResetNetwork(setNetworkInterface, xenNetworkInformation, setNetworkRoutes);
+
+            providerData = new ProviderData();
+
+            command = new ResetNetwork(setNetworkInterface, xenNetworkInformation, setNetworkRoutes, setProviderData, xenProviderDataInformation);
             xenNetworkInformation.Stub(x => x.Get()).Return(network);
+            xenProviderDataInformation.Stub(x => x.Get()).Return(providerData);
 
             result = command.Execute(null);            
         }
@@ -37,6 +49,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         public void should_set_interface_from_interfaceconfigiuration() {
             setNetworkInterface.AssertWasCalled(x => x.Execute(new List<NetworkInterface> { networkInterface }));
             setNetworkRoutes.AssertWasCalled(x => x.Execute(network));
+            setProviderData.AssertWasCalled(x => x.Execute(providerData));
         }
 
         [TearDown]
