@@ -159,11 +159,27 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 
         private void CleanseInterfaceForSetup(string interfaceName)
         {
+            // In Windows 2012 by default interfaces are DISABLED. 
+            _executableProcessQueue.Enqueue("netsh",
+                                            string.Format("interface set interface \"{0}\" admin=ENABLED",
+                                                          interfaceName));
             _executableProcessQueue.Enqueue("netsh",
                                             string.Format("interface ip set address name=\"{0}\" source=dhcp",
                                                           interfaceName), new[] { "0", "1" });
             foreach (var ipv6Address in _ipFinder.findIpv6Addresses(interfaceName))
             {
+                #region Windows 2012 Hack 
+                // - Adding an ipv6 interface address and removing it, if not the delete ipv6 address fails with "The system cannot find the file specified."
+                var addAddresscommand = string.Format("interface ipv6 add address interface=\"{0}\" address=1::",
+                                            interfaceName);
+                _executableProcessQueue.Enqueue("netsh", addAddresscommand);
+
+                var deleteAddresscommand = string.Format("interface ipv6 delete address interface=\"{0}\" address=1::",
+                                            interfaceName);
+                _executableProcessQueue.Enqueue("netsh", deleteAddresscommand);
+
+                #endregion
+                // Do the real thing :-)
                 //Address returned is of the format 'address%scope'
                 string address = ipv6Address.ToString().Split('%')[0].ToUpper();
                 var command = string.Format("interface ipv6 delete address interface=\"{0}\" address={1}",
