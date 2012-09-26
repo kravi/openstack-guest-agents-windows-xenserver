@@ -32,7 +32,8 @@ namespace Rackspace.Cloud.Server.Agent.Actions
         }
 
         public void Execute(string kmsServerAndPort) {
-            if(!_operatingSystemChecker.IsWindows2008) return;
+            // Commenting this line for Windows 2012 activation.
+            //if(!_operatingSystemChecker.IsWindows2008) return;
 
             _executableProcessQueue
                 .Enqueue("cscript", Constants.KmsActivationVbsPath + " /skms " + kmsServerAndPort)

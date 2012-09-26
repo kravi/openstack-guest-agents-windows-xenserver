@@ -28,20 +28,20 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             exec.AssertWasCalled(x => x.Enqueue("cscript", "c:\\windows\\system32\\slmgr.vbs /ato"));
         }
 
-        [Test]
-        public void should_not_run_vbs_script_when_windows_2003()
-        {
-            exec = MockRepository.GenerateMock<IExecutableProcessQueue>();
-            exec.Expect(x => x.Enqueue(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Repeat.Never();
-            exec.Expect(x => x.Go()).Repeat.Never();
-            _operatingSystemChecker = MockRepository.GenerateMock<IOperatingSystemChecker>();
-            _operatingSystemChecker.Stub(x => x.IsWindows2008).Return(false);
+        //[Test]
+        //public void should_not_run_vbs_script_when_windows_2003()
+        //{
+        //    exec = MockRepository.GenerateMock<IExecutableProcessQueue>();
+        //    exec.Expect(x => x.Enqueue(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Repeat.Never();
+        //    exec.Expect(x => x.Go()).Repeat.Never();
+        //    _operatingSystemChecker = MockRepository.GenerateMock<IOperatingSystemChecker>();
+        //    _operatingSystemChecker.Stub(x => x.IsWindows2008).Return(false);
 
-            new ActivateWindowsUsingKms(exec, _operatingSystemChecker).Execute("server:port");
+        //    new ActivateWindowsUsingKms(exec, _operatingSystemChecker).Execute("server:port");
 
-            exec.AssertWasNotCalled(x => x.Enqueue("cscript", "c:\\windows\\system32\\slmgr.vbs /skms " + "server:port"));
-            exec.AssertWasNotCalled(x => x.Enqueue("cscript", "c:\\windows\\system32\\slmgr.vbs /ato"));
-        }
+        //    exec.AssertWasNotCalled(x => x.Enqueue("cscript", "c:\\windows\\system32\\slmgr.vbs /skms " + "server:port"));
+        //    exec.AssertWasNotCalled(x => x.Enqueue("cscript", "c:\\windows\\system32\\slmgr.vbs /ato"));
+        //}
 
         [TearDown]
         public void Teardown()
