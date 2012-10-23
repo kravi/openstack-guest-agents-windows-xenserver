@@ -161,7 +161,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
         {
             // In Windows 2012 by default interfaces are DISABLED. 
             _executableProcessQueue.Enqueue("netsh",
-                                            string.Format("interface set interface \"{0}\" admin=ENABLED",
+                                            string.Format("interface set interface name=\"{0}\" admin=ENABLED",
                                                           interfaceName));
             _executableProcessQueue.Enqueue("netsh",
                                             string.Format("interface ip set address name=\"{0}\" source=dhcp",
