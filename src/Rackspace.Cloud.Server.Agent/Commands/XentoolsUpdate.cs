@@ -15,6 +15,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.ServiceProcess;
 using Rackspace.Cloud.Server.Agent.Actions;
 using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
@@ -68,7 +70,8 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                                                String.Format("/S /norestart /D={0}", Constants.XenToolsPath)}
                                        });
                 _serviceRestarter.Restart("xensvc");
-                _serviceRestarter.Restart("XenServerVssProvider");
+                if (DoesServiceExist("XenServerVssProvider"))
+                    _serviceRestarter.Restart("XenServerVssProvider");
                 Statics.ShouldPollXenStore = true;
                 return new ExecutableResult();
             }
@@ -84,5 +87,11 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             }
         }
 
+        public static bool DoesServiceExist(string serviceName)
+        {
+            var services = ServiceController.GetServices();
+            var service = services.FirstOrDefault(s => s.ServiceName.Equals(serviceName, StringComparison.InvariantCultureIgnoreCase));
+            return service != null;
+        }
     }
 }
