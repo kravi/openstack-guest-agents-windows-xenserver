@@ -24,10 +24,12 @@ namespace Rackspace.Cloud.Server.Agent.Specs
         private IConnectionChecker _connectionChecker;
         private IServiceRestarter _serviceRestarter;
         private ILogger _logger;
+        private MockRepository _mockRepo;
 
         [SetUp]
         public void Setup()
         {
+            _mockRepo = new MockRepository();
             _agentUpdateInfo = "http://something.com/file.zip,544564abc453de787ad";
 
             _downloader = MockRepository.GenerateMock<IDownloader>();
@@ -38,7 +40,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             _connectionChecker = MockRepository.GenerateMock<IConnectionChecker>();
             _sleeper = MockRepository.GenerateMock<ISleeper>();
             _logger = MockRepository.GenerateMock<ILogger>();
-            _serviceRestarter = MockRepository.GenerateMock<IServiceRestarter>();
+            _serviceRestarter = _mockRepo.StrictMock<IServiceRestarter>();
             _agentUpdateMessageHandler = new AgentUpdateMessageHandler();
 
             _logger.Stub(x => x.Log(Arg<string>.Is.Anything));
@@ -70,8 +72,22 @@ namespace Rackspace.Cloud.Server.Agent.Specs
                                                  ));
             _serviceRestarter.Expect(x => x.Restart("xensvc"));
             _serviceRestarter.Expect(x => x.Restart("XenServerVssProvider"));
-
+            _serviceRestarter.Expect(x => x.ServiceExists("XenServerVssProvider")).Return(true);
+            _mockRepo.ReplayAll();
             _xentoolsUpdate.Execute(_agentUpdateInfo);
+            _mockRepo.VerifyAll();
+        }
+
+        [Test]
+        public void should_not_restart_vss_provider_if_service_does_not_exist()
+        {
+            _serviceRestarter.Expect(x => x.Restart("xensvc"));
+            _serviceRestarter.Expect(x => x.Restart("XenServerVssProvider")).Repeat.Never();
+            _serviceRestarter.Expect(x => x.ServiceExists("XenServerVssProvider")).Return(false);
+
+            _mockRepo.ReplayAll();
+            _xentoolsUpdate.Execute(_agentUpdateInfo);
+            _mockRepo.VerifyAll();
         }
 
         [Test]

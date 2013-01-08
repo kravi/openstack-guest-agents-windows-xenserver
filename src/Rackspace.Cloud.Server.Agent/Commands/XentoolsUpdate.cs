@@ -70,14 +70,13 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                                                String.Format("/S /norestart /D={0}", Constants.XenToolsPath)}
                                        });
                 _serviceRestarter.Restart("xensvc");
-                if (DoesServiceExist("XenServerVssProvider"))
+                if (_serviceRestarter.ServiceExists("XenServerVssProvider"))
                     _serviceRestarter.Restart("XenServerVssProvider");
                 Statics.ShouldPollXenStore = true;
                 return new ExecutableResult();
             }
             catch (Exception ex)
             {
-
                 _logger.Log(String.Format("Exception was : {0}\nStackTrace Was: {1}", ex.Message, ex.StackTrace));
                 return new ExecutableResult { Error = new List<string> { "Update failed" }, ExitCode = "1" };
             }
@@ -85,13 +84,6 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             {
                 _finalizer.Finalize(new List<string>{Constants.XenToolsUnzipPath,Constants.XenToolsReleasePackage});
             }
-        }
-
-        public static bool DoesServiceExist(string serviceName)
-        {
-            var services = ServiceController.GetServices();
-            var service = services.FirstOrDefault(s => s.ServiceName.Equals(serviceName, StringComparison.InvariantCultureIgnoreCase));
-            return service != null;
         }
     }
 }

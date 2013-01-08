@@ -14,6 +14,8 @@
 //    under the License.
 
 using System;
+using System.Linq;
+using System.ServiceProcess;
 using Rackspace.Cloud.Server.Common.Logging;
 
 namespace Rackspace.Cloud.Server.Agent.Actions
@@ -21,6 +23,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
     public interface IServiceRestarter
     {
         void Restart(string serviceName);
+        bool ServiceExists(string serviceName);
     }
 
     public class ServiceRestarter : IServiceRestarter
@@ -42,6 +45,13 @@ namespace Rackspace.Cloud.Server.Agent.Actions
             _serviceStopper.Stop(serviceName);
             _serviceStarter.Start(serviceName);
             _logger.Log(String.Format("Restart of service '{0}' successful.", serviceName));
+        }
+
+        public bool ServiceExists(string serviceName)
+        {
+            var services = ServiceController.GetServices();
+            var service = services.FirstOrDefault(s => s.ServiceName.Equals(serviceName, StringComparison.InvariantCultureIgnoreCase));
+            return service != null;
         }
     }
 }
