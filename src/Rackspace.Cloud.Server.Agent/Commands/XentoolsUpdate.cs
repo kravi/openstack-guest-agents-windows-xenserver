@@ -15,6 +15,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.ServiceProcess;
 using Rackspace.Cloud.Server.Agent.Actions;
 using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
@@ -68,13 +70,13 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                                                String.Format("/S /norestart /D={0}", Constants.XenToolsPath)}
                                        });
                 _serviceRestarter.Restart("xensvc");
-                _serviceRestarter.Restart("XenServerVssProvider");
+                if (_serviceRestarter.ServiceExists("XenServerVssProvider"))
+                    _serviceRestarter.Restart("XenServerVssProvider");
                 Statics.ShouldPollXenStore = true;
                 return new ExecutableResult();
             }
             catch (Exception ex)
             {
-
                 _logger.Log(String.Format("Exception was : {0}\nStackTrace Was: {1}", ex.Message, ex.StackTrace));
                 return new ExecutableResult { Error = new List<string> { "Update failed" }, ExitCode = "1" };
             }
@@ -83,6 +85,5 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                 _finalizer.Finalize(new List<string>{Constants.XenToolsUnzipPath,Constants.XenToolsReleasePackage});
             }
         }
-
     }
 }

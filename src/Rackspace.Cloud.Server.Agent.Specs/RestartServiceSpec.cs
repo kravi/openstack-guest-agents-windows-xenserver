@@ -30,5 +30,17 @@ namespace Rackspace.Cloud.Server.Agent.Specs.RestartServiceSpec
 
             _serviceRestarter.Restart("testServiceName");
         }
+
+        [Test]
+        public void should_be_true_if_service_exists()
+        {
+            Assert.IsTrue(_serviceRestarter.ServiceExists("eventlog"));
+        }
+
+        [Test]
+        public void should_be_false_if_service_does_not_exist()
+        {
+            Assert.IsFalse(_serviceRestarter.ServiceExists("unknownService"));
+        }
     }
 }
