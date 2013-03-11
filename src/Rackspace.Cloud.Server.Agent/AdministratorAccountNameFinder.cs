@@ -23,7 +23,7 @@ namespace Rackspace.Cloud.Server.Agent {
         public string Find()
         {
             var msc = new ManagementScope("\\root\\cimv2");
-            const string QUERY_STRING = "SELECT * FROM Win32_UserAccount";
+            const string QUERY_STRING = "SELECT * FROM Win32_UserAccount WHERE LocalAccount = TRUE";
             var q = new SelectQuery(QUERY_STRING);
             var query = new ManagementObjectSearcher(msc,q);
             var queryCollection = query.Get();
