@@ -60,6 +60,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IInstaller>().TheDefaultIsConcreteType<Installer>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkInterface>().TheDefaultIsConcreteType<SetNetworkInterface>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkRoutes>().TheDefaultIsConcreteType<SetNetworkRoutes>();
+            StructureMapConfiguration.BuildInstancesOf<ISetHostnameAction>().TheDefaultIsConcreteType<SetHostnameAction>();
 
             StructureMapConfiguration.BuildInstancesOf<ISetProviderData>().TheDefaultIsConcreteType<SetProviderData>();
 
@@ -96,6 +97,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<Features>().WithName(Utilities.Commands.features.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<Unrescue>().WithName(Utilities.Commands.unrescue.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<UpdaterUpdate>().WithName(Utilities.Commands.updaterupdate.ToString());
+            StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<SetHostname>().WithName(Utilities.Commands.sethostname.ToString());
         }
     }
 }

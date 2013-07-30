@@ -100,6 +100,7 @@
     <Compile Include="ReadProviderDataInformationSpec.cs" />
     <Compile Include="ResetNetworkSpec.cs" />
     <Compile Include="RestartServiceSpec.cs" />
+    <Compile Include="SetHostnameSpec.cs" />
     <Compile Include="SetNetworkInterfaceSpec.cs" />
     <Compile Include="SetNetworkRoutesSpec.cs" />
     <Compile Include="SetPasswordCommandSpec.cs" />

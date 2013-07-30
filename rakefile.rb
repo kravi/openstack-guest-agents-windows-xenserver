@@ -17,6 +17,8 @@ task :version do
   Rake::Task["update_service:assemblyinfo"].execute
   Rake::Task["common:assemblyinfo"].execute
   Rake::Task["diffie_hellman:assemblyinfo"].execute
+  Rake::Task["diffie_hellmanSpecs:assemblyinfo"].execute
+  Rake::Task["agentSpecs:assemblyinfo"].execute
 end
 
 namespace :agent do
@@ -39,7 +41,31 @@ namespace :common do
     asm.product_name = PRODUCT
     asm.description = DESCRIPTION
     asm.copyright = COPYRIGHT
-    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.Agent','Properties','AssemblyInfo.cs')
+    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.Common','Properties','AssemblyInfo.cs')
+  end
+end
+
+namespace :agentSpecs do
+  desc "Update the version information for agentSpecs"
+  assemblyinfo :assemblyinfo do |asm|
+    asm.version = RELEASE_BUILD_NUMBER
+    asm.company_name = COMPANY
+    asm.product_name = PRODUCT
+    asm.description = DESCRIPTION
+    asm.copyright = COPYRIGHT
+    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.Agent.Specs','Properties','AssemblyInfo.cs')
+  end
+end
+
+namespace :diffie_hellmanSpecs do
+  desc "Update the version information for diffie_hellmanSpecs library"
+  assemblyinfo :assemblyinfo do |asm|
+    asm.version = RELEASE_BUILD_NUMBER
+    asm.company_name = COMPANY
+    asm.product_name = PRODUCT
+    asm.description = DESCRIPTION
+    asm.copyright = COPYRIGHT
+    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.DiffieHellman.Specs','Properties','AssemblyInfo.cs')
   end
 end
 
@@ -51,7 +77,7 @@ namespace :diffie_hellman do
     asm.product_name = PRODUCT
     asm.description = DESCRIPTION
     asm.copyright = COPYRIGHT
-    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.Agent','Properties','AssemblyInfo.cs')
+    asm.output_file = File.join(ABSOLUTE_PATH,'src','Rackspace.Cloud.Server.Agent.DiffieHellman','Properties','AssemblyInfo.cs')
   end
 end
 

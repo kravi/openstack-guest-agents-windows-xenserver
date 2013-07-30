@@ -31,7 +31,8 @@ namespace Rackspace.Cloud.Server.Agent.Utilities
         injectfile,
         features,
         unrescue,
-        updaterupdate
+        updaterupdate,
+        sethostname
     }
 
     public class NotUrlEncodedAttribute : Attribute
