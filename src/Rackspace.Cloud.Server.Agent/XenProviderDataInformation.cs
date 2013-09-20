@@ -60,7 +60,7 @@ namespace Rackspace.Cloud.Server.Agent
         public void GetRoles(ref ProviderData providerData)
         {
             var jsonData = _xenStore.ReadVmProviderDataKey(Constants.Roles);
-            providerData.roles = new Json<List<string>>().Deserialize(jsonData);
+            providerData.roles = new Json<List<string>>().Deserialize(jsonData) ?? new List<string>();
         }
 
         public void GetRegion(ref ProviderData providerData)

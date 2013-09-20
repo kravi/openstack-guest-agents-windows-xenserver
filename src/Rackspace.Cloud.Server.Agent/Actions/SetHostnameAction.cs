@@ -7,6 +7,9 @@ namespace Rackspace.Cloud.Server.Agent.Actions
     {
         public string SetHostname(string hostname)
         {
+            if (string.IsNullOrEmpty(hostname))
+                return 0.ToString();
+
             var oldName = Environment.MachineName;
             using (var cs = new ManagementObject(@"Win32_Computersystem.Name='" + oldName + "'"))
             {

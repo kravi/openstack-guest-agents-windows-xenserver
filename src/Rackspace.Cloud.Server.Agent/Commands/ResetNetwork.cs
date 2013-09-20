@@ -31,9 +31,11 @@ namespace Rackspace.Cloud.Server.Agent.Commands
 
         private readonly ISetProviderData _setProviderData;
         private readonly IXenProviderDataInformation _xenProviderDataInformation;
+        private readonly ISetHostnameAction _setHostname;
+        private readonly IXenStore _xenStore;
 
-        public ResetNetwork(ISetNetworkInterface setNetworkInterface, IXenNetworkInformation xenNetworkInformation, ISetNetworkRoutes setNetworkRoutes,
-            ISetProviderData setProviderData, IXenProviderDataInformation xenProviderDataInformation)
+        public ResetNetwork(ISetNetworkInterface setNetworkInterface, IXenNetworkInformation xenNetworkInformation, ISetNetworkRoutes setNetworkRoutes, 
+            ISetProviderData setProviderData, IXenProviderDataInformation xenProviderDataInformation, ISetHostnameAction setHostname, IXenStore xenStore)
         {
             _setNetworkInterface = setNetworkInterface;
             _xenNetworkInformation = xenNetworkInformation;
@@ -41,6 +43,8 @@ namespace Rackspace.Cloud.Server.Agent.Commands
 
             _setProviderData = setProviderData;
             _xenProviderDataInformation = xenProviderDataInformation;
+            _setHostname = setHostname;
+            _xenStore = xenStore;
         }
 
         public ExecutableResult Execute(string keyValue)
@@ -52,6 +56,9 @@ namespace Rackspace.Cloud.Server.Agent.Commands
 
             var providerData = _xenProviderDataInformation.Get();
             _setProviderData.Execute(providerData);
+
+            var hostname = _xenStore.ReadVmData("hostname");
+            _setHostname.SetHostname(hostname);
 
             return new ExecutableResult();
         }

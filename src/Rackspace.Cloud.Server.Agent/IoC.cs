@@ -32,7 +32,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcess>().TheDefaultIsConcreteType<ExecutableProcess>();
             StructureMapConfiguration.BuildInstancesOf<ILogger>().TheDefaultIsConcreteType<Logger>();
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcessQueue>().TheDefaultIsConcreteType<ExecutableProcessQueue>();
-            StructureMapConfiguration.BuildInstancesOf<IXenStore>().TheDefaultIsConcreteType<XenStore>();
+            StructureMapConfiguration.BuildInstancesOf<IXenStore>().TheDefaultIsConcreteType<XenStoreWmi>();
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcessCommandPatternSubsitution>().TheDefaultIsConcreteType<ExecutableProcessCommandPatternSubsitution>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkInterface>().TheDefaultIsConcreteType<SetNetworkInterface>();
             StructureMapConfiguration.BuildInstancesOf<ISetPassword>().TheDefaultIsConcreteType<SetPassword>();
