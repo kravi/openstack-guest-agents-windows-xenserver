@@ -7,3 +7,5 @@ Gems needed to run rake:
 
 rake (version 0.8.6+)
 albacore (version 0.2.2)
+fileutils
+rubyzip (version 0.9.8)

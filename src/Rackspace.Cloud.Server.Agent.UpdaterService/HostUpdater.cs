@@ -13,10 +13,13 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
+using System.Collections;
 using System.Reflection;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Security.Principal;
 using Rackspace.Cloud.Server.Common.Configuration;
 using Rackspace.Cloud.Server.Common.Logging;
 using StructureMap;
@@ -40,17 +43,30 @@ namespace Rackspace.Cloud.Server.Agent.UpdaterService {
         }
 
         private void ConfigureRemotingHost() {
-            SetTcpChannel();
+            SetIpcChannel();
             SetRemotingType();
         }
 
-        private void SetTcpChannel() {
-            ChannelServices.RegisterChannel(new TcpChannel(SvcConfiguration.RemotingPort), false);
+        private void SetIpcChannel() {
+            // Get SID code for the Built in Administrators group
+            SecurityIdentifier sid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            // Get the NT account related to the SID
+            NTAccount account = sid.Translate(typeof(NTAccount)) as NTAccount;
+
+            IDictionary sProperties = new Hashtable();
+            sProperties["portName"] = SvcConfiguration.IpcUriHost;
+            sProperties["authorizedGroup"] = account.Value;
+
+            BinaryServerFormatterSinkProvider serverProvider = new BinaryServerFormatterSinkProvider();
+
+            IpcServerChannel channel = new IpcServerChannel(sProperties, serverProvider);
+            ChannelServices.RegisterChannel(channel, true);
+
         }
 
         private void SetRemotingType() {
             RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(AgentUpdater), SvcConfiguration.RemotingUri, WellKnownObjectMode.SingleCall);
+                typeof(AgentUpdater), SvcConfiguration.IpcUriName, WellKnownObjectMode.SingleCall);
         }
 
         public void OnStop() {

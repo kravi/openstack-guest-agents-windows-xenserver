@@ -31,6 +31,14 @@ namespace Rackspace.Cloud.Server.Common.Configuration {
             get { return Convert.ToInt32(ConfigurationManager.AppSettings["RemotingPort"]); }
         }
 
+        public static string IpcUriHost {
+            get { return ConfigurationManager.AppSettings["IpcUriHost"]; }
+        }
+
+        public static string IpcUriName {
+            get { return ConfigurationManager.AppSettings["IpcUriName"]; }
+        }
+
         public static string AgentPath {
             get { return ConfigurationManager.AppSettings["AgentPath"]; }
         }

@@ -15,7 +15,9 @@
 
 using System;
 using System.Reflection;
+using System.Text;
 using System.Timers;
+using Rackspace.Cloud.Server.Agent.Commands;
 using Rackspace.Cloud.Server.Agent.Interfaces;
 using Rackspace.Cloud.Server.Common.Logging;
 using StructureMap;
@@ -38,11 +40,15 @@ namespace Rackspace.Cloud.Server.Agent.Service {
 
             _timer = new ProdTimer { Interval = TIMER_INTERVAL_IS_SIX_SECONDS };
             _timer.Elapsed(TimerElapsed);
-            _timer.Enabled = true;
+            
 
             StructureMapConfiguration.UseDefaultStructureMapConfigFile = false;
             StructureMapConfiguration.BuildInstancesOf<ITimer>().TheDefaultIs(Registry.Object(_timer));
             IoC.Register();
+
+            CheckAgentUpdater();
+
+            _timer.Enabled = true;
         }
 
         public void Onstop() {
@@ -56,6 +62,32 @@ namespace Rackspace.Cloud.Server.Agent.Service {
                 ObjectFactory.GetInstance<ServiceWork>().Do();
             } catch (Exception ex) {
                 _logger.Log("Exception was : " + ex.Message + "\nStackTrace Was: " + ex.StackTrace);
+            }
+        }
+
+        private void CheckAgentUpdater()
+        {
+            try
+            {
+                var minAgentUpdater = new CommandFactory().CreateCommand(Utilities.Commands.ensureminagentupdater.ToString());
+                var result = minAgentUpdater.Execute(string.Empty);
+                if (result.ExitCode == "1")
+                {
+                    var sb = new StringBuilder();
+                    if (result.Error != null)
+                    {
+                        foreach (var error in result.Error)
+                        {
+                            sb.AppendLine(error);
+                        }
+                    }
+                    
+                    throw new Exception(sb.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(string.Format("Error checking the min version of the updater and updating: {0}", ex));
             }
         }
     }

@@ -73,6 +73,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Security" />
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceProcess" />
@@ -84,7 +85,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\BackupUpdater.cs" />
     <Compile Include="Actions\ChecksumValidator.cs" />
+    <Compile Include="Actions\ExtractEmbededResource.cs" />
     <Compile Include="Actions\ISetHostnameAction.cs" />
     <Compile Include="Actions\SetHostnameAction.cs" />
     <Compile Include="Actions\SetProviderData.cs" />
@@ -99,6 +102,7 @@
     <Compile Include="Actions\Sleeper.cs" />
     <Compile Include="Actions\ServiceStarter.cs" />
     <Compile Include="Actions\ServiceStopper.cs" />
+    <Compile Include="Commands\EnsureMinAgentUpdater.cs" />
     <Compile Include="Commands\SetHostname.cs" />
     <Compile Include="Commands\Unrescue.cs" />
     <Compile Include="Actions\Unzipper.cs" />
@@ -114,6 +118,7 @@
     <Compile Include="Configuration\Ipv4Tuple.cs" />
     <Compile Include="Configuration\Ipv6Tuple.cs" />
     <Compile Include="Netsh\NetshFirewallRuleNameAvailable.cs" />
+    <Compile Include="UpdaterFiles\Updater.cs" />
     <Compile Include="XenProviderDataInformation.cs" />
     <Compile Include="DiffieHellmanPrerequisitesChecker.cs" />
     <Compile Include="Actions\SetNetworkRoutes.cs" />
@@ -175,6 +180,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="UpdaterFiles\UpdateService.zip" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rackspace.Cloud.Server.Agent.DiffieHellman\Rackspace.Cloud.Server.DiffieHellman.csproj">
@@ -203,6 +209,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

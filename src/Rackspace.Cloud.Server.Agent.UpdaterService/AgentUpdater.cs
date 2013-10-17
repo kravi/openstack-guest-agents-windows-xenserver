@@ -35,7 +35,7 @@ namespace Rackspace.Cloud.Server.Agent.UpdaterService {
             _agentUpdateInfo = agentUpdateInfo;
             _logger.Log(String.Format("Received from Agent the following data:\r\nURL:{0}\r\nCHECKSUM:{1}, will resume in a minute", _agentUpdateInfo.url, _agentUpdateInfo.signature));
 
-            new Timer(TimerElapsed,null,60000,0);
+            new Timer(TimerElapsed,null,10000,0);
         }
 
         private void TimerElapsed(object sender) {
