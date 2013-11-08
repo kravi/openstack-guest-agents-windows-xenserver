@@ -23,6 +23,7 @@ using Rackspace.Cloud.Server.Common.Logging;
 using Rackspace.Cloud.Server.DiffieHellman;
 using StructureMap;
 using StructureMap.Configuration.DSL;
+using WinRegistry = Microsoft.Win32.Registry;
 
 namespace Rackspace.Cloud.Server.Agent {
     public class IoC {
@@ -32,7 +33,10 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcess>().TheDefaultIsConcreteType<ExecutableProcess>();
             StructureMapConfiguration.BuildInstancesOf<ILogger>().TheDefaultIsConcreteType<Logger>();
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcessQueue>().TheDefaultIsConcreteType<ExecutableProcessQueue>();
-            StructureMapConfiguration.BuildInstancesOf<IXenStore>().TheDefaultIsConcreteType<XenStoreWmi>();
+            if (IsWmiTools())
+                StructureMapConfiguration.BuildInstancesOf<IXenStore>().TheDefaultIsConcreteType<XenStoreWmi>();
+            else
+                StructureMapConfiguration.BuildInstancesOf<IXenStore>().TheDefaultIsConcreteType<XenStore>();
             StructureMapConfiguration.BuildInstancesOf<IExecutableProcessCommandPatternSubsitution>().TheDefaultIsConcreteType<ExecutableProcessCommandPatternSubsitution>();
             StructureMapConfiguration.BuildInstancesOf<ISetNetworkInterface>().TheDefaultIsConcreteType<SetNetworkInterface>();
             StructureMapConfiguration.BuildInstancesOf<ISetPassword>().TheDefaultIsConcreteType<SetPassword>();
@@ -101,6 +105,14 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<UpdaterUpdate>().WithName(Utilities.Commands.updaterupdate.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<SetHostname>().WithName(Utilities.Commands.sethostname.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<EnsureMinAgentUpdater>().WithName(Utilities.Commands.ensureminagentupdater.ToString());
+        }
+
+        private static bool IsWmiTools()
+        {
+            var majorVersion = (int) WinRegistry.GetValue(Constants.XenToolsRegPath, "MajorVersion", 0);
+            var minorVersion = (int) WinRegistry.GetValue(Constants.XenToolsRegPath, "MinorVersion", 0);
+
+            return float.Parse(majorVersion + "." + minorVersion) > 6.0;
         }
     }
 }

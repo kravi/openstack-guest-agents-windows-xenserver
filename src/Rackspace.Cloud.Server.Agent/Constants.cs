@@ -60,5 +60,6 @@ namespace Rackspace.Cloud.Server.Agent {
         public static readonly string UpdaterReleasePackageName = "UpdateService.zip";
         public static readonly string UpdaterEmbeddedReleasePackagePath = "Rackspace.Cloud.Server.Agent.UpdaterFiles.UpdateService.zip";
         public static readonly string UpdaterReleasePackage = SvcConfiguration.AgentVersionUpdatesPath + UpdaterReleasePackageName;
+        public static readonly string XenToolsRegPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Citrix\XenTools";
     }
 }
