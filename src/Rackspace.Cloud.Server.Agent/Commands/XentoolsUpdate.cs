@@ -59,7 +59,6 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                 Statics.ShouldPollXenStore = false;
                 _logger.Log(String.Format("XenTools Update value: {0}\r\nWill resume in 60 seconds", value));
                 _sleeper.Sleep(60);
-                _connectionChecker.Check();
                 var agentUpdateInfo = _agentUpdateMessageHandler.Handle(value);
                 _downloader.Download(agentUpdateInfo.url, Constants.XenToolsReleasePackage);
                 _checksumValidator.Validate(agentUpdateInfo.signature, Constants.XenToolsReleasePackage);
@@ -72,7 +71,6 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                 _serviceRestarter.Restart("xensvc");
                 if (_serviceRestarter.ServiceExists("XenServerVssProvider"))
                     _serviceRestarter.Restart("XenServerVssProvider");
-                Statics.ShouldPollXenStore = true;
                 return new ExecutableResult();
             }
             catch (Exception ex)
@@ -82,6 +80,7 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             }
             finally
             {
+                Statics.ShouldPollXenStore = true;
                 _finalizer.Finalize(new List<string>{Constants.XenToolsUnzipPath,Constants.XenToolsReleasePackage});
             }
         }

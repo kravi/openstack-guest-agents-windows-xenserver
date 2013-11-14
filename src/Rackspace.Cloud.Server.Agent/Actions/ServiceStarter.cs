@@ -35,19 +35,26 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 
         public void Start(string serviceName)
         {
-            _logger.Log(String.Format("Starting '{0}' Service ...", serviceName));
-            var serviceController = new ServiceController(serviceName);
-            if (serviceController.Status == ServiceControllerStatus.Running)
+            try
             {
-                _logger.Log(String.Format("'{0}' service already started.", serviceName));
-                return;
+                _logger.Log(String.Format("Starting '{0}' Service ...", serviceName));
+                var serviceController = new ServiceController(serviceName);
+                if (serviceController.Status == ServiceControllerStatus.Running)
+                {
+                    _logger.Log(String.Format("'{0}' service already started.", serviceName));
+                    return;
+                }
+
+                serviceController.Start();
+                serviceController.WaitForStatus(ServiceControllerStatus.Running);
+
+                serviceController.Close();
+                _logger.Log(String.Format("Service '{0}' started and now running ...", serviceName));
             }
-
-            serviceController.Start();
-            serviceController.WaitForStatus(ServiceControllerStatus.Running);
-
-            serviceController.Close();
-            _logger.Log(String.Format("Service '{0}' started and now running ...", serviceName));
+            catch (Exception ex)
+            {
+                _logger.Log(string.Format("An error occured trying to start the {0} service: {1}", serviceName, ex));
+            }
         }
     }
 }

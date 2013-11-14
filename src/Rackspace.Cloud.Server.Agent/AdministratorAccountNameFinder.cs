@@ -22,19 +22,35 @@ namespace Rackspace.Cloud.Server.Agent {
     public class AdministratorAccountNameFinder : IAdministratorAccountNameFinder {
         public string Find()
         {
+            var admin = GetAdminAccount(true);
+
+            if (string.IsNullOrEmpty(admin))
+            {
+                //If we get here we are most likely running on a Domain Controller
+                //and we need to get the domain admin account
+                //NOTE: A password reset for a Domain Admin Account will only work from our system account if we are running on a DC
+                admin = GetAdminAccount(false);
+            }
+
+            return admin;
+        }
+
+        private string GetAdminAccount(bool local)
+        {
             var msc = new ManagementScope("\\root\\cimv2");
-            const string QUERY_STRING = "SELECT * FROM Win32_UserAccount WHERE LocalAccount = TRUE";
-            var q = new SelectQuery(QUERY_STRING);
-            var query = new ManagementObjectSearcher(msc,q);
+            const string QUERY_STRING_LOCAL = "SELECT * FROM Win32_UserAccount WHERE LocalAccount = TRUE";
+            const string QUERY_STRING_NON_LOCAL = "SELECT * FROM Win32_UserAccount WHERE LocalAccount = FALSE";
+            var q = new SelectQuery(local ? QUERY_STRING_LOCAL : QUERY_STRING_NON_LOCAL);
+            var query = new ManagementObjectSearcher(msc, q);
             var queryCollection = query.Get();
 
             var administratorAccountName = "";
-            foreach( ManagementObject mo in queryCollection ) 
+            foreach (ManagementObject mo in queryCollection)
             {
                 var sid = mo["SID"].ToString();
                 if (sid.LastIndexOf("-500") != (sid.Length - 4)) continue;
-                
-                administratorAccountName = String.Format("{0}", mo["Name"]); 
+
+                administratorAccountName = String.Format("{0}", mo["Name"]);
             }
 
             return administratorAccountName;

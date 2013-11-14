@@ -73,6 +73,8 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IUnzipper>().TheDefaultIsConcreteType<Unzipper>();
             StructureMapConfiguration.BuildInstancesOf<IFileCopier>().TheDefaultIsConcreteType<FileCopier>();
             StructureMapConfiguration.BuildInstancesOf<IIPFinder>().TheDefaultIsConcreteType<IPFinder>();
+            StructureMapConfiguration.BuildInstancesOf<IBackupUpdater>().TheDefaultIsConcreteType<BackupUpdater>();
+            StructureMapConfiguration.BuildInstancesOf<IExtractEmbededResource>().TheDefaultIsConcreteType<ExtractEmbededResource>();
 
 
             StructureMapConfiguration.BuildInstancesOf<IDiffieHellman>().TheDefaultIs(
@@ -98,6 +100,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<Unrescue>().WithName(Utilities.Commands.unrescue.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<UpdaterUpdate>().WithName(Utilities.Commands.updaterupdate.ToString());
             StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<SetHostname>().WithName(Utilities.Commands.sethostname.ToString());
+            StructureMapConfiguration.AddInstanceOf<IExecutableCommand>().UsingConcreteType<EnsureMinAgentUpdater>().WithName(Utilities.Commands.ensureminagentupdater.ToString());
         }
     }
 }

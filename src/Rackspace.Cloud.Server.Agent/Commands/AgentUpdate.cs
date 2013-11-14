@@ -39,7 +39,6 @@ namespace Rackspace.Cloud.Server.Agent.Commands {
         }
 
         public ExecutableResult Execute(string value) {
-            _connectionChecker.Check();
             _logger.Log("Agent Update value: " + value);
             var agentUpdateInfo = _agentUpdateMessageHandler.Handle(value);
 

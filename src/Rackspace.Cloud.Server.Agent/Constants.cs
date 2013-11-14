@@ -54,8 +54,11 @@ namespace Rackspace.Cloud.Server.Agent {
         public static readonly string XenToolsUnzipPath = SvcConfiguration.AgentVersionUpdatesPath + "xentools";
         public static readonly string XenToolsSetupExecutablePath = XenToolsUnzipPath + @"\xensetup.exe";
 
-        public static readonly string UpdaterReleasePackage = SvcConfiguration.AgentVersionUpdatesPath + "UpdateService.zip";
         public static readonly string UpdaterUnzipPath = SvcConfiguration.AgentVersionUpdatesPath + "updater";
+        public static readonly string UpdaterBackupPath = SvcConfiguration.AgentVersionUpdatesPath + "current_updater";
         public static readonly string UpdaterPath = @"C:\Program Files\Rackspace\Cloud Servers\AgentUpdater";
+        public static readonly string UpdaterReleasePackageName = "UpdateService.zip";
+        public static readonly string UpdaterEmbeddedReleasePackagePath = "Rackspace.Cloud.Server.Agent.UpdaterFiles.UpdateService.zip";
+        public static readonly string UpdaterReleasePackage = SvcConfiguration.AgentVersionUpdatesPath + UpdaterReleasePackageName;
     }
 }
