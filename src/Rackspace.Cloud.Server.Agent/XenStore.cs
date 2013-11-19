@@ -13,7 +13,6 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Rackspace.Cloud.Server.Agent.Configuration;
@@ -40,7 +39,7 @@ namespace Rackspace.Cloud.Server.Agent
         {
             var messageKeysAsUuids = Read(Constants.WritableDataHostBase).ValidateAndClean();
             IList<Command> commands = new List<Command>();
-
+                
             foreach (var messageKey in messageKeysAsUuids)
             {
                 var result = ReadKey(messageKey);
@@ -55,6 +54,12 @@ namespace Rackspace.Cloud.Server.Agent
         public string ReadKey(string key)
         {
             var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.WritableDataHostBase, key));
+            return result.Output.First();
+        }
+
+        public string ReadVmData(string key)
+        {
+            var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, key));
             return result.Output.First();
         }
 

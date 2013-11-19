@@ -37,6 +37,7 @@ namespace Rackspace.Cloud.Server.Agent {
 
         public void Work() {
             var commands = _store.GetCommands();
+            _logger.Log(string.Format("Command count {0}", commands.Count));
             if (commands.Count == 0) {
                 LogManager.ShouldBeLogging = false;
                 return;
