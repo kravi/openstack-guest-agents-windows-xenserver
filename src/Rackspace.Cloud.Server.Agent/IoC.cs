@@ -109,8 +109,8 @@ namespace Rackspace.Cloud.Server.Agent {
 
         private static bool IsWmiTools()
         {
-            var majorVersion = (int) WinRegistry.GetValue(Constants.XenToolsRegPath, "MajorVersion", 0);
-            var minorVersion = (int) WinRegistry.GetValue(Constants.XenToolsRegPath, "MinorVersion", 0);
+            var majorVersion = (int) (WinRegistry.GetValue(Constants.XenToolsRegPath, "MajorVersion", 0) ?? 0);
+            var minorVersion = (int) (WinRegistry.GetValue(Constants.XenToolsRegPath, "MinorVersion", 0) ?? 0);
 
             return float.Parse(majorVersion + "." + minorVersion) > 6.0;
         }
