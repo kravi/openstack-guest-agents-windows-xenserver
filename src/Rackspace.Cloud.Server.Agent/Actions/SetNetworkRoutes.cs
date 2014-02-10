@@ -41,12 +41,15 @@ namespace Rackspace.Cloud.Server.Agent.Actions
         public void Execute(Network network)
         {
             IList<NetworkRoute> routes = new List<NetworkRoute>();
-            var publicGateway = "";
+            _logger.Log("Routes Found: " + routes.Count);
+            DeleteExistingPersistentRoutesRoutes();
 
             foreach (var networkInterface in network.Interfaces.Values)
             {
-                if (networkInterface.label.ToLower() == "public") publicGateway = networkInterface.gateway;
-                if(networkInterface.routes == null || networkInterface.routes.Length < 1) continue;
+                var publicGateway = networkInterface.gateway;
+                if (!string.IsNullOrEmpty(publicGateway))
+                    _executableProcessQueue.Enqueue("route", String.Format("-p add 0.0.0.0 mask 0.0.0.0 {0} metric 2", publicGateway));
+                if (networkInterface.routes == null || networkInterface.routes.Length < 1) continue;
 
                 foreach (var route in networkInterface.routes)
                 {
@@ -55,10 +58,6 @@ namespace Rackspace.Cloud.Server.Agent.Actions
                 }
             }
 
-            _logger.Log("Routes Found: " + routes.Count);
-
-            DeleteExistingPersistentRoutesRoutes();
-            _executableProcessQueue.Enqueue("route", String.Format("-p add 0.0.0.0 mask 0.0.0.0 {0} metric 2", publicGateway));
 
             foreach (var route in routes)
             {
