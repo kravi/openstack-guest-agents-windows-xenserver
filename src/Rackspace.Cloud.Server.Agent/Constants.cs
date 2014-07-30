@@ -22,6 +22,14 @@ namespace Rackspace.Cloud.Server.Agent {
         public const string XenClientPath = XenToolsPath + @"\xenstore_client.exe";
         public const string KmsActivationVbsPath = @"c:\windows\system32\slmgr.vbs";
 
+
+        public const string RackspaceRegKey = @"SOFTWARE\Rackspace";
+        public const string CloudAutomationSysPrepRegKey = "cloud-automation";
+        public const string CloudAutomationKMSActivateRegKey = "cloud-automation-run";
+
+        public const string CloudAutomationCmdPath = @"c:\cloud-automation\bootstrap.cmd";
+        public const string CloudAutomationBatPath = @"c:\cloud-automation\bootstrap.bat";
+
         public const string ReadOnlyDataConfigBase = "vm-data";
         public const string WritableDataHostBase = "data/host";
         public const string WritableDataGuestBase = "data/guest";
@@ -61,5 +69,6 @@ namespace Rackspace.Cloud.Server.Agent {
         public static readonly string UpdaterEmbeddedReleasePackagePath = "Rackspace.Cloud.Server.Agent.UpdaterFiles.UpdateService.zip";
         public static readonly string UpdaterReleasePackage = SvcConfiguration.AgentVersionUpdatesPath + UpdaterReleasePackageName;
         public static readonly string XenToolsRegPath = @"HKEY_LOCAL_MACHINE\SOFTWARE\Citrix\XenTools";
+
     }
 }

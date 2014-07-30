@@ -13,23 +13,31 @@
 //    License for the specific language governing permissions and limitations
 //    under the License.
 
+using System;
 using Rackspace.Cloud.Server.Agent.Actions;
 using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
+using Rackspace.Cloud.Server.Common.Logging;
+using Rackspace.Cloud.Server.Common.Restart;
 
 namespace Rackspace.Cloud.Server.Agent.Commands
 {
     public class KmsActivate : IExecutableCommand
     {
         private readonly IActivateWindowsUsingKms _activateWindowsUsingKms;
+        private readonly ICloudAutomationActions _cloudAutomationActions;
+        private readonly ILogger _logger;
 
-        public KmsActivate(IActivateWindowsUsingKms activateWindowsUsingKms)
+        public KmsActivate(IActivateWindowsUsingKms activateWindowsUsingKms, ICloudAutomationActions cloudAutomationActions, ILogger logger)
         {
             _activateWindowsUsingKms = activateWindowsUsingKms;
+            _cloudAutomationActions = cloudAutomationActions;
+            _logger = logger;
         }
 
         public ExecutableResult Execute(string value)
         {
+            _cloudAutomationActions.RunKMSActivateCloudAutomationScripts();
             _activateWindowsUsingKms.Execute(value);
             return new ExecutableResult();
         }

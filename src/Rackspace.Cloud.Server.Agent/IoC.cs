@@ -79,6 +79,8 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IIPFinder>().TheDefaultIsConcreteType<IPFinder>();
             StructureMapConfiguration.BuildInstancesOf<IBackupUpdater>().TheDefaultIsConcreteType<BackupUpdater>();
             StructureMapConfiguration.BuildInstancesOf<IExtractEmbededResource>().TheDefaultIsConcreteType<ExtractEmbededResource>();
+            StructureMapConfiguration.BuildInstancesOf<ICloudAutomationSubActions>().TheDefaultIsConcreteType<CloudAutomationSubActions>();
+            StructureMapConfiguration.BuildInstancesOf<ICloudAutomationActions>().TheDefaultIsConcreteType<CloudAutomationActions>();
 
 
             StructureMapConfiguration.BuildInstancesOf<IDiffieHellman>().TheDefaultIs(
