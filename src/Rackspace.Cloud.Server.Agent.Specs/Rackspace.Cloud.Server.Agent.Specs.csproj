@@ -81,6 +81,7 @@
     <Compile Include="AgentUpdateMessageHandlerSpec.cs" />
     <Compile Include="AgentUpdateSpec.cs" />
     <Compile Include="ChecksumValidatorSpec.cs" />
+    <Compile Include="CloudAutomationSubActionsSpec.cs" />
     <Compile Include="CommandFactorySpec.cs" />
     <Compile Include="DownloaderSpec.cs" />
     <Compile Include="EncryptionSpec.cs" />

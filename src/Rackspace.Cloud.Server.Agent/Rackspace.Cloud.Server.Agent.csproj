@@ -87,6 +87,8 @@
   <ItemGroup>
     <Compile Include="Actions\BackupUpdater.cs" />
     <Compile Include="Actions\ChecksumValidator.cs" />
+    <Compile Include="Actions\CloudAutomationActions.cs" />
+    <Compile Include="Actions\CloudAutomationSubActions.cs" />
     <Compile Include="Actions\ExtractEmbededResource.cs" />
     <Compile Include="Actions\ISetHostnameAction.cs" />
     <Compile Include="Actions\SetHostnameAction.cs" />

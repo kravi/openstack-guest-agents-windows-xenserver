@@ -24,6 +24,7 @@ using Rackspace.Cloud.Server.Common.Restart;
 using StructureMap;
 using StructureMap.Configuration.DSL;
 using Rackspace.Cloud.Server.Common.Commands;
+using Rackspace.Cloud.Server.Agent.Actions;
 
 namespace Rackspace.Cloud.Server.Agent.Service {
     public class ServerClass {
@@ -50,6 +51,7 @@ namespace Rackspace.Cloud.Server.Agent.Service {
             StructureMapConfiguration.BuildInstancesOf<ITimer>().TheDefaultIs(Registry.Object(_timer));
             IoC.Register();
 
+            RunCloudAutomation();
             CheckAgentUpdater();
 
             _timer.Enabled = true;
@@ -94,6 +96,12 @@ namespace Rackspace.Cloud.Server.Agent.Service {
             {
                 _logger.Log(string.Format("Error checking the min version of the updater and updating: {0}", ex));
             }
+        }
+
+        private void RunCloudAutomation()
+        {
+            var cloudAutomationActions = ObjectFactory.GetInstance<ICloudAutomationActions>();
+            cloudAutomationActions.RunPostRebootCloudAutomationScripts();
         }
     }
 }
