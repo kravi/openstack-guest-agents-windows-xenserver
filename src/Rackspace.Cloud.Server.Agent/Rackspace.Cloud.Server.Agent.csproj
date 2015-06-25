@@ -119,6 +119,7 @@
     <Compile Include="Configuration\ProviderData.cs" />
     <Compile Include="Configuration\Ipv4Tuple.cs" />
     <Compile Include="Configuration\Ipv6Tuple.cs" />
+    <Compile Include="XenUserMetadata.cs" />
     <Compile Include="PreAndPostCommandAttribute.cs" />
     <Compile Include="XenStoreWmi.cs" />
     <Compile Include="Netsh\NetshFirewallRuleNameAvailable.cs" />

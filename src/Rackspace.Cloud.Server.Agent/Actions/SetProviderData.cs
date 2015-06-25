@@ -27,7 +27,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 {
     public interface ISetProviderData
     {
-        void Execute(ProviderData providerData);
+        void Execute(ProviderData providerData, List<string> userMetadata);
     }
 
     public class SetProviderData : ISetProviderData
@@ -43,13 +43,13 @@ namespace Rackspace.Cloud.Server.Agent.Actions
             _logger = logger;
         }
 
-        public void Execute(ProviderData providerData)
+        public void Execute(ProviderData providerData, List<string> userMetadata)
         {
             string logMessage = string.Format(" Provider Data Deserialzed : {0}", new Json<ProviderData>().Serialize(providerData));
 
             _logger.Log(logMessage);
 
-            if (CheckRoleNameMatch(providerData))
+            if (CheckRoleNameMatch(providerData, userMetadata))
             {
                 if (providerData.white_List_Ips.Count > 0)
                 {
@@ -79,18 +79,19 @@ namespace Rackspace.Cloud.Server.Agent.Actions
             }
             else
             {
-                _logger.Log(string.Format("Role Names did not match. Roles names from provider data {0}. Role names from configuration {1}",
-                                            string.Join(",", providerData.roles.ToArray()), string.Join(",", GetFirewallRoles().ToArray())));
+                _logger.Log(string.Format("Role Names did not match. Roles names from provider data {0}. Role names from configuration {1}. UserMetadata:{2}",
+                                            string.Join(",", providerData.roles.ToArray()), string.Join(",", GetFirewallRoles().ToArray()), string.Join(",", userMetadata.ToArray())));
             }
 
         }
 
-        private bool CheckRoleNameMatch(ProviderData providerData)
+        private bool CheckRoleNameMatch(ProviderData providerData, List<string> userMetadata)
         {
             var result = false;
 
             var configFirewallRoles = GetFirewallRoles();
 
+            _logger.Log(string.Format("Validating Roles: {0}.", string.Join(",", providerData.roles.ToArray())));
             foreach (var roleName in providerData.roles)
             {
                 if (configFirewallRoles.Any(configRoleName => string.Equals(roleName, configRoleName, StringComparison.OrdinalIgnoreCase)))
@@ -98,6 +99,9 @@ namespace Rackspace.Cloud.Server.Agent.Actions
                     result = true;
                 }
             }
+            _logger.Log(string.Format("Roles did not match, validating user-metadata:{0}", string.Join(",", userMetadata.ToArray())));
+            if (userMetadata.Contains(SvcConfiguration.FirewallMetadataKey))
+                result = true;
 
             return result;
         }

@@ -26,7 +26,7 @@ namespace Rackspace.Cloud.Server.Agent {
         public const string RackspaceRegKey = @"SOFTWARE\Rackspace";
         public const string CloudAutomationSysPrepRegKey = "cloud-automation";
         public const string CloudAutomationKMSActivateRegKey = "cloud-automation-run";
-
+        
         public const string CloudAutomationCmdPath = @"c:\cloud-automation\bootstrap.cmd";
         public const string CloudAutomationBatPath = @"c:\cloud-automation\bootstrap.bat";
 
@@ -34,6 +34,7 @@ namespace Rackspace.Cloud.Server.Agent {
         public const string WritableDataHostBase = "data/host";
         public const string WritableDataGuestBase = "data/guest";
         public const string NetworkingBase = "networking";
+        public const string MetadataBase = "user-metadata";
         public const string ProviderDataBase = "provider_data";
         public const string Provider = "provider";
         public const string Roles = "roles";

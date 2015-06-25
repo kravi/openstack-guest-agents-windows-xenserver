@@ -16,22 +16,26 @@ namespace Rackspace.Cloud.Server.Agent.Specs
     public class SetProviderDataSpecBase
     {
         protected ProviderData ProviderData;
+        protected List<string> UserMetadata;
         protected SetProviderData SetProviderData;
         protected IExecutableProcessQueue ExecutableProcessQueue;
         protected ILogger Logger;
         protected INetshFirewallRuleNameAvailable NetshFirewallRuleNameAvailable;
+        protected IXenUserMetadata XenUserMetadata;
 
         internal void Setup()
         {
             NetshFirewallRuleNameAvailable = MockRepository.GenerateMock<INetshFirewallRuleNameAvailable>();
+            XenUserMetadata = MockRepository.GenerateMock<IXenUserMetadata>();
             Logger = MockRepository.GenerateMock<ILogger>();
 
+            XenUserMetadata.Stub(a => a.GetKeys()).Return(new List<string>());
             ExecutableProcessQueue = MockRepository.GenerateMock<IExecutableProcessQueue>();
             ExecutableProcessQueue.Stub(x => x.Enqueue(Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(
                 ExecutableProcessQueue);
 
             SetProviderData = new SetProviderData(ExecutableProcessQueue, NetshFirewallRuleNameAvailable, Logger);
-
+            UserMetadata = new List<string>();
             ProviderData = GetProviderDataWithFakeRoles();
         }
 
@@ -57,12 +61,11 @@ namespace Rackspace.Cloud.Server.Agent.Specs
         [Test]
         public void should_not_have_called_executable_process()
         {
-
             Setup();
-            SetProviderData.Execute(ProviderData);
+            SetProviderData.Execute(ProviderData, UserMetadata);
             ExecutableProcessQueue.AssertWasNotCalled(
                 queue => queue.Enqueue(Arg<string>.Is.Equal("netsh"), Arg<string>.Is.Anything));
-            Logger.AssertWasCalled(l => l.Log("Role Names did not match. Roles names from provider data fake role1,fake role2. Role names from configuration rax_managed,rack_connect"));
+            Logger.AssertWasCalled(l => l.Log("Role Names did not match. Roles names from provider data fake role1,fake role2. Role names from configuration rax_managed,rack_connect,rax_build_config. UserMetadata:"));
         }
 
         [Test]
@@ -72,7 +75,31 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             NetshFirewallRuleNameAvailable.Stub(x => x.IsRuleAvailable(Constants.SoftwareFirewallRuleName)).Return(true);
 
             ProviderData.roles = new List<string>() { "rax_managed", "rack_connect" };
-            SetProviderData.Execute(ProviderData);
+            SetProviderData.Execute(ProviderData, UserMetadata);
+            ExecutableProcessQueue.AssertWasCalled(
+                queue => queue.Enqueue("netsh", "advfirewall firewall set rule name=\"RS_FIREWALL_RULE\" new enable=yes remoteip=10.177.212.96,10.181.136.241,10.176.89.224,10.177.212.79"));
+        }
+
+        [Test]
+        public void should_have_called_executable_process_when_firewall_rule_is_available_with_rax_build_config_role()
+        {
+            Setup();
+            NetshFirewallRuleNameAvailable.Stub(x => x.IsRuleAvailable(Constants.SoftwareFirewallRuleName)).Return(true);
+
+            ProviderData.roles = new List<string>() { "rax_build_config" };
+            SetProviderData.Execute(ProviderData, UserMetadata);
+            ExecutableProcessQueue.AssertWasCalled(
+                queue => queue.Enqueue("netsh", "advfirewall firewall set rule name=\"RS_FIREWALL_RULE\" new enable=yes remoteip=10.177.212.96,10.181.136.241,10.176.89.224,10.177.212.79"));
+        }
+
+        [Test]
+        public void should_have_called_executable_process_when_firewall_rule_is_available_with_metadata()
+        {
+            Setup();
+            NetshFirewallRuleNameAvailable.Stub(x => x.IsRuleAvailable(Constants.SoftwareFirewallRuleName)).Return(true);
+
+            UserMetadata.Add("build_config");
+            SetProviderData.Execute(ProviderData, UserMetadata);
             ExecutableProcessQueue.AssertWasCalled(
                 queue => queue.Enqueue("netsh", "advfirewall firewall set rule name=\"RS_FIREWALL_RULE\" new enable=yes remoteip=10.177.212.96,10.181.136.241,10.176.89.224,10.177.212.79"));
         }
@@ -85,7 +112,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             NetshFirewallRuleNameAvailable.Stub(x => x.IsRuleAvailable(Constants.SoftwareFirewallRuleName)).Return(false);
             ProviderData.roles = new List<string>() { "rax_managed", "rack_connect" };
 
-            SetProviderData.Execute(ProviderData);
+            SetProviderData.Execute(ProviderData, UserMetadata);
             ExecutableProcessQueue.AssertWasCalled(
                 queue => queue.Enqueue("netsh", "advfirewall firewall add rule name=\"RS_FIREWALL_RULE\" enable=yes dir=in profile=public,private,domain localip=any remoteip=10.177.212.96,10.181.136.241,10.176.89.224,10.177.212.79 protocol=tcp localport=445 remoteport=any edge=no action=allow"));
         }
@@ -97,7 +124,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             NetshFirewallRuleNameAvailable.Stub(x => x.IsRuleAvailable(Constants.SoftwareFirewallRuleName)).Return(false);
             ProviderData.roles = new List<string>() { "rax_managed", "dark_knight" };
 
-            SetProviderData.Execute(ProviderData);
+            SetProviderData.Execute(ProviderData, UserMetadata);
             ExecutableProcessQueue.AssertWasCalled(
                 queue => queue.Enqueue("netsh", "advfirewall firewall add rule name=\"RS_FIREWALL_RULE\" enable=yes dir=in profile=public,private,domain localip=any remoteip=10.177.212.96,10.181.136.241,10.176.89.224,10.177.212.79 protocol=tcp localport=445 remoteport=any edge=no action=allow"));
         }
@@ -111,7 +138,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             ProviderData.white_List_Ips = new List<string>();
             ProviderData.roles = new List<string>() { "rax_managed", "rack_connect" };
 
-            SetProviderData.Execute(ProviderData);
+            SetProviderData.Execute(ProviderData, UserMetadata);
             ExecutableProcessQueue.AssertWasNotCalled(
                 queue => queue.Enqueue(Arg<string>.Is.Equal("netsh"), Arg<string>.Is.Anything));
             Logger.AssertWasCalled(l => l.Log("White List Ips not available. Firewall rules will not be added/updated."));

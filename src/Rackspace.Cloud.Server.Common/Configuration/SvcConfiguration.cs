@@ -57,6 +57,11 @@ namespace Rackspace.Cloud.Server.Common.Configuration {
             get { return ConfigurationManager.AppSettings["FirewallRoleNames"]; }
         }
 
+        public static string FirewallMetadataKey
+        {
+            get { return ConfigurationManager.AppSettings["FirewallMetadataKey"]; }
+        }
+
         public static string PreHookPath(string command)
         {
             return ConfigurationManager.AppSettings[string.Format("{0}_pre", command.ToLower())];
