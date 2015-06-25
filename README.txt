@@ -9,3 +9,5 @@ rake (version 0.8.6+)
 albacore (version 0.2.2)
 fileutils
 rubyzip (version 0.9.8)
+
+Note: ImageMagick-6.7.9-9 version might be required for fileutils to work correctly.

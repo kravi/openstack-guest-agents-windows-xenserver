@@ -42,6 +42,13 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
         }
 
         [Test]
+        public void when_valid_metadata_should_return_dictionary()
+        {
+            var userMetadata = new Json<Dictionary<string, string>>().Deserialize("{ \"whatever\": \"test\",\"test2\":\"whatever\"}");
+            Assert.IsTrue(userMetadata.Count() == 2);
+        }
+
+        [Test]
         [ExpectedException(typeof(UnsuccessfulCommandExecutionException), ExpectedMessage = "Problem deserializing the following json: '{'")]
         public void should_throw_exception_with_curly_brace()
         {

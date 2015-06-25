@@ -42,6 +42,7 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<ISetPassword>().TheDefaultIsConcreteType<SetPassword>();
             StructureMapConfiguration.BuildInstancesOf<IWmiMacNetworkNameGetter>().TheDefaultIsConcreteType<WmiMacNetworkNameGetter>();
             StructureMapConfiguration.BuildInstancesOf<IXenNetworkInformation>().TheDefaultIsConcreteType<XenNetworkInformation>();
+            StructureMapConfiguration.BuildInstancesOf<IXenUserMetadata>().TheDefaultIsConcreteType<XenUserMetadata>();
             StructureMapConfiguration.BuildInstancesOf<IAgentUpdateMessageSender>().TheDefaultIsConcreteType<AgentUpdateMessageSender>();
             StructureMapConfiguration.BuildInstancesOf<IDiffieHellmanPrerequisitesChecker>().TheDefaultIsConcreteType<DiffieHellmanPrerequisitesChecker>();
             StructureMapConfiguration.BuildInstancesOf<IOperatingSystemChecker>().TheDefaultIsConcreteType<OperatingSystemChecker>();
