@@ -47,7 +47,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
             foreach (var networkInterface in network.Interfaces.Values)
             {
                 var publicGateway = networkInterface.gateway;
-                if (!string.IsNullOrEmpty(publicGateway))
+                if (publicGateway != null && !string.IsNullOrEmpty(publicGateway.Trim()))
                     _executableProcessQueue.Enqueue("route", String.Format("-p add 0.0.0.0 mask 0.0.0.0 {0} metric 2", publicGateway));
                 if (networkInterface.routes == null || networkInterface.routes.Length < 1) continue;
 
