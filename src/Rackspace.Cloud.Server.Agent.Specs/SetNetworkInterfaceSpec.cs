@@ -107,7 +107,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             ExecutableProcessQueue.AssertWasCalled(
                 x =>
                 x.Enqueue("netsh",
-                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes"));
+                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes", new[] { "0", "1" }));
         }
 
         [Test]
@@ -135,7 +135,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             ExecutableProcessQueue.AssertWasCalled(
                 x =>
                 x.Enqueue("netsh",
-                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes"));
+                          "interface ipv6 add route prefix=::/0 interface=\"Lan1\" nexthop=fe80::def publish=Yes", new[] { "0", "1" }));
         }
 
   

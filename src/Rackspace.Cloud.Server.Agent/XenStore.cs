@@ -25,6 +25,11 @@ namespace Rackspace.Cloud.Server.Agent
     {
         private readonly IExecutableProcess _executableProcess;
 
+        protected virtual string GetXenClientPath()
+        {
+            return Constants.XenClientPath;
+        }
+
         public XenStore(IExecutableProcess executableProcess)
         {
             _executableProcess = executableProcess;
@@ -32,7 +37,7 @@ namespace Rackspace.Cloud.Server.Agent
 
         public IEnumerable<string> Read(string key)
         {
-            return _executableProcess.Run(Constants.XenClientPath, "dir " + key).Output;
+            return _executableProcess.Run(GetXenClientPath(), "dir " + key).Output;
         }
 
         public IList<Command> GetCommands()
@@ -53,25 +58,25 @@ namespace Rackspace.Cloud.Server.Agent
 
         public string ReadKey(string key)
         {
-            var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.WritableDataHostBase, key));
+            var result = _executableProcess.Run(GetXenClientPath(), "read " + Constants.Combine(Constants.WritableDataHostBase, key));
             return result.Output.First();
         }
 
         public string ReadVmData(string key)
         {
-            var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, key));
+            var result = _executableProcess.Run(GetXenClientPath(), "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, key));
             return result.Output.First();
         }
 
         public string ReadVmDataKey(string key)
         {
-            var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, Constants.NetworkingBase, key));
+            var result = _executableProcess.Run(GetXenClientPath(), "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, Constants.NetworkingBase, key));
             return result.Output.First();
         }
 
         public string ReadVmProviderDataKey(string key)
         {
-            var result = _executableProcess.Run(Constants.XenClientPath, "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, Constants.ProviderDataBase, key));
+            var result = _executableProcess.Run(GetXenClientPath(), "read " + Constants.Combine(Constants.ReadOnlyDataConfigBase, Constants.ProviderDataBase, key));
             if (result.ExitCode == "0" && result.Output != null && result.Output.Any())
                 return result.Output.First();
             return string.Empty;
@@ -79,12 +84,12 @@ namespace Rackspace.Cloud.Server.Agent
 
         public void Write(string key, string value)
         {
-            _executableProcess.Run(Constants.XenClientPath, "write " + Constants.Combine(Constants.WritableDataGuestBase, key) + " " + value.EscapeQuotesForXenClientWrite());
+            _executableProcess.Run(GetXenClientPath(), "write " + Constants.Combine(Constants.WritableDataGuestBase, key) + " " + value.EscapeQuotesForXenClientWrite());
         }
 
         public void Remove(string key)
         {
-            _executableProcess.Run(Constants.XenClientPath, "remove " + Constants.Combine(Constants.WritableDataHostBase, key));
+            _executableProcess.Run(GetXenClientPath(), "remove " + Constants.Combine(Constants.WritableDataHostBase, key));
         }
     }
 }

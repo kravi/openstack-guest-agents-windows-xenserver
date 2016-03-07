@@ -54,6 +54,17 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 
             VerifyAllNetworkInterfacesFoundOnMachine(nameAndMacs, networkInterfaces);
 
+            //Cleaning up Network configurations on all nic's prior to trying to set network information
+            //we found cases where the network information may be swapped between nics this corrects that scenario
+            foreach (var networkName in ReverseSortWithKey(nameAndMacs))
+            {
+                var matchedNetworkInterface = networkInterfaces.Find(x => nameAndMacs[networkName].Equals(x.mac.ToUpper()));
+                if (matchedNetworkInterface != null)
+                {
+                    CleanseInterfaceForSetup(networkName);
+                }
+            }
+
             foreach (var networkName in ReverseSortWithKey(nameAndMacs))
             {
                 var matchedNetworkInterface = networkInterfaces.Find(x => nameAndMacs[networkName].Equals(x.mac.ToUpper()));
@@ -78,7 +89,6 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 
         private void SetNetworkInterfaceValues(NetworkInterface networkInterface, string interfaceName)
         {
-            CleanseInterfaceForSetup(interfaceName);
             SetupIpv4Interface(interfaceName, networkInterface);
             SetupIpv6Interface(interfaceName, networkInterface);
 
@@ -122,7 +132,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
 
             command = string.Format("interface ipv6 add route prefix=::/0 interface=\"{0}\" nexthop={1} publish=Yes",
                 interfaceName, ip6tuple.gateway);
-            _executableProcessQueue.Enqueue("netsh", command);
+            _executableProcessQueue.Enqueue("netsh", command, new [] { "0" , "1" });
         }
 
         private void LogLocalInterfaces(IDictionary<string, string> nameAndMacs)

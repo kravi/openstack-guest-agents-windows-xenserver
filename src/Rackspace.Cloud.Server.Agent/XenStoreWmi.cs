@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Text;
 using Rackspace.Cloud.Server.Agent.Configuration;
 using Rackspace.Cloud.Server.Agent.Interfaces;
 using Rackspace.Cloud.Server.Agent.Utilities;
@@ -30,6 +31,33 @@ namespace Rackspace.Cloud.Server.Agent
         private const string rootWmi = @"\\.\root\wmi";
 
         private static ManagementObject _session;
+
+        internal static bool IsWmiEnabled()
+        {
+            var wmiEnabled = false;
+            
+            try
+            {
+                LogManager.Instance.Info("Checking for Xen Tools WMI Interface");
+                using (var mc = new ManagementClass(rootWmi, "CitrixXenStoreBase", new ObjectGetOptions()))
+                {
+                    var baseInstances = mc.GetInstances();
+                    wmiEnabled = true;
+                    LogManager.Instance.Info("Xen Tools WMI Interface detected..");
+                }
+            }
+            catch (ManagementException e)
+            {
+                var sbError = new StringBuilder();
+                sbError.AppendLine("Xen Tools WMI Check Failed...");
+                sbError.AppendLine(string.Format("Root Namespace Checked: {0}", rootWmi));
+                sbError.AppendLine("WMI Class Checked: CitrixXenStoreBase");
+                sbError.AppendLine(string.Format("Error: {0}", e));
+                LogManager.Instance.Info(sbError);
+            }
+
+            return wmiEnabled;
+        }
 
         public XenStoreWmi(ILogger logger)
         {
@@ -100,6 +128,7 @@ namespace Rackspace.Cloud.Server.Agent
             }
             catch(Exception e)
             {
+                _logger.Log(string.Format("Read Key Error\nKey: {0} \nException: {1}", key, e));
                 return new List<string>();
             }
         }
@@ -153,11 +182,23 @@ namespace Rackspace.Cloud.Server.Agent
 
         private string ReadDataKey(string keyPath)
         {
-            var paramList = new Dictionary<string, string>{ { "Pathname", keyPath}};
-            var inParams = addPramsToMethod(Session, "GetValue", paramList);
-            var managementBaseObject = Session.InvokeMethod("GetValue", inParams, null);
-            if (managementBaseObject == null) return string.Empty;
-            return (string) managementBaseObject.GetPropertyValue("value");
+            try
+            {
+                if (string.IsNullOrEmpty(keyPath))
+                {
+                    throw new Exception("Empty keyPath passed in");
+                }
+                var paramList = new Dictionary<string, string> { { "Pathname", keyPath } };
+                var inParams = addPramsToMethod(Session, "GetValue", paramList);
+                var managementBaseObject = Session.InvokeMethod("GetValue", inParams, null);
+                if (managementBaseObject == null) return string.Empty;
+                return (string)managementBaseObject.GetPropertyValue("value");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(string.Format("Error reading path: {0} \n{1}", keyPath ?? string.Empty, ex));
+                return string.Empty;
+            }
         }
 
         public void Write(string key, string value)
