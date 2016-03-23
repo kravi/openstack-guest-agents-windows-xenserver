@@ -37,8 +37,9 @@ namespace Rackspace.Cloud.Server.Agent.Commands
         private readonly IConnectionChecker _connectionChecker;
         private readonly IAgentUpdateMessageHandler _agentUpdateMessageHandler;
         private readonly ILogger _logger;
+        private readonly IXenToolsUpdateSubActions _xenToolsUpdateSubActions;
 
-        public XentoolsUpdate(ISleeper sleeper, IDownloader downloader, IChecksumValidator checksumValidator, IUnzipper unzipper, IInstaller installer, IFinalizer finalizer, IServiceRestarter _serviceRestarter,IConnectionChecker connectionChecker, IAgentUpdateMessageHandler agentUpdateMessageHandler, ILogger logger)
+        public XentoolsUpdate(ISleeper sleeper, IDownloader downloader, IChecksumValidator checksumValidator, IUnzipper unzipper, IInstaller installer, IFinalizer finalizer, IServiceRestarter _serviceRestarter,IConnectionChecker connectionChecker, IAgentUpdateMessageHandler agentUpdateMessageHandler, ILogger logger, IXenToolsUpdateSubActions xenToolsUpdateSubActions)
         {
             _sleeper = sleeper;
             _downloader = downloader;
@@ -50,6 +51,7 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             _connectionChecker = connectionChecker;
             _agentUpdateMessageHandler = agentUpdateMessageHandler;
             _logger = logger;
+            _xenToolsUpdateSubActions = xenToolsUpdateSubActions;
         }
 
         public ExecutableResult Execute(string value)
@@ -60,17 +62,20 @@ namespace Rackspace.Cloud.Server.Agent.Commands
                 _logger.Log(String.Format("XenTools Update value: {0}\r\nWill resume in 60 seconds", value));
                 _sleeper.Sleep(60);
                 var agentUpdateInfo = _agentUpdateMessageHandler.Handle(value);
+                _finalizer.Finalize(new List<string> { Constants.XenToolsUnzipPath, Constants.XenToolsReleasePackage });
                 _downloader.Download(agentUpdateInfo.url, Constants.XenToolsReleasePackage);
                 _checksumValidator.Validate(agentUpdateInfo.signature, Constants.XenToolsReleasePackage);
                 _unzipper.Unzip(Constants.XenToolsReleasePackage, Constants.XenToolsUnzipPath, "");
-                _installer.Install(new Dictionary<string, string>
-                                       {
-                                           {Constants.XenToolsSetupExecutablePath,
-                                               String.Format("/S /norestart /D={0}", Constants.XenToolsPath)}
-                                       });
-                _serviceRestarter.Restart("xensvc");
-                if (_serviceRestarter.ServiceExists("XenServerVssProvider"))
-                    _serviceRestarter.Restart("XenServerVssProvider");
+
+                if (IsCustomPackage())
+                {
+                    RunCustomPackage();
+                }
+                else
+                {
+                    RunLegacyUpdate();
+                }
+
                 return new ExecutableResult();
             }
             catch (Exception ex)
@@ -81,8 +86,33 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             finally
             {
                 Statics.ShouldPollXenStore = true;
-                _finalizer.Finalize(new List<string>{Constants.XenToolsUnzipPath,Constants.XenToolsReleasePackage});
             }
+        }
+
+        public void RunLegacyUpdate()
+        {
+            _installer.Install(new Dictionary<string, string>
+                                       {
+                                           {Constants.XenToolsSetupExecutablePath,
+                                               String.Format("/S /norestart /D={0}", Constants.XenToolsPath)}
+                                       });
+            _serviceRestarter.Restart("xensvc");
+            if (_serviceRestarter.ServiceExists("XenServerVssProvider"))
+                _serviceRestarter.Restart("XenServerVssProvider");
+        }
+
+        public void RunCustomPackage()
+        {
+            _xenToolsUpdateSubActions.WriteXenToolsUpdateSignal();
+            _installer.Install(new Dictionary<string, string>
+                                       {
+                                           {Constants.XenToolsSetupScriptPath, ""}
+                                       });
+        }
+
+        public bool IsCustomPackage()
+        {
+            return System.IO.File.Exists(Constants.XenToolsSetupScriptPath);
         }
     }
 }

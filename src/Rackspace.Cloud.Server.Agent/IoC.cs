@@ -84,6 +84,8 @@ namespace Rackspace.Cloud.Server.Agent {
             StructureMapConfiguration.BuildInstancesOf<IExtractEmbededResource>().TheDefaultIsConcreteType<ExtractEmbededResource>();
             StructureMapConfiguration.BuildInstancesOf<ICloudAutomationSubActions>().TheDefaultIsConcreteType<CloudAutomationSubActions>();
             StructureMapConfiguration.BuildInstancesOf<ICloudAutomationActions>().TheDefaultIsConcreteType<CloudAutomationActions>();
+            StructureMapConfiguration.BuildInstancesOf<IXenToolsUpdateActions>().TheDefaultIsConcreteType<XenToolsUpdateActions>();
+            StructureMapConfiguration.BuildInstancesOf<IXenToolsUpdateSubActions>().TheDefaultIsConcreteType<XenToolsUpdateSubActions>();
 
 
             StructureMapConfiguration.BuildInstancesOf<IDiffieHellman>().TheDefaultIs(
