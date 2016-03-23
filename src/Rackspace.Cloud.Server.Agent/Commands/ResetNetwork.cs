@@ -61,10 +61,14 @@ namespace Rackspace.Cloud.Server.Agent.Commands
             var userMetadata = _xenUserMetadata.GetKeys();
             _setProviderData.Execute(providerData, userMetadata);
 
-            var hostname = _xenStore.ReadVmData("hostname");
-            var hostnameResult = _setHostname.SetHostname(hostname);
-
-            return new ExecutableResult() { ExitCode = hostnameResult };
+            if (string.IsNullOrEmpty(keyValue) || !keyValue.StartsWith("nohostname"))
+            {
+                var hostname = _xenStore.ReadVmData("hostname");
+                var hostnameResult = _setHostname.SetHostname(hostname);
+                return new ExecutableResult() { ExitCode = hostnameResult };
+            }
+            
+            return new ExecutableResult() { ExitCode = "0" };
         }
     }
 }

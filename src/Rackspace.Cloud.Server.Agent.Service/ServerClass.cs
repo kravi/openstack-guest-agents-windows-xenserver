@@ -51,6 +51,7 @@ namespace Rackspace.Cloud.Server.Agent.Service {
             StructureMapConfiguration.BuildInstancesOf<ITimer>().TheDefaultIs(Registry.Object(_timer));
             IoC.Register();
 
+            RunXenToolsUpgradeChecks();
             RunCloudAutomation();
             CheckAgentUpdater();
 
@@ -102,6 +103,12 @@ namespace Rackspace.Cloud.Server.Agent.Service {
         {
             var cloudAutomationActions = ObjectFactory.GetInstance<ICloudAutomationActions>();
             cloudAutomationActions.RunPostRebootCloudAutomationScripts();
+        }
+
+        private void RunXenToolsUpgradeChecks()
+        {
+            var xenToolsUpdateActions = ObjectFactory.GetInstance<IXenToolsUpdateActions>();
+            xenToolsUpdateActions.ProcessXenToolsPostUpgradeActions();
         }
     }
 }

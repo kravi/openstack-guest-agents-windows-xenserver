@@ -104,6 +104,8 @@
     <Compile Include="Actions\Sleeper.cs" />
     <Compile Include="Actions\ServiceStarter.cs" />
     <Compile Include="Actions\ServiceStopper.cs" />
+    <Compile Include="Actions\XenToolsUpdateActions.cs" />
+    <Compile Include="Actions\XenToolsUpdateSubActions.cs" />
     <Compile Include="Commands\EnsureMinAgentUpdater.cs" />
     <Compile Include="Commands\SetHostname.cs" />
     <Compile Include="Commands\Unrescue.cs" />

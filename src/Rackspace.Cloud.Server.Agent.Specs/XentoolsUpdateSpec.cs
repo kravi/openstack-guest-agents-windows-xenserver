@@ -25,6 +25,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs
         private IServiceRestarter _serviceRestarter;
         private ILogger _logger;
         private MockRepository _mockRepo;
+        private IXenToolsUpdateSubActions _xenToolsUpdateSubActions;
 
         [SetUp]
         public void Setup()
@@ -40,12 +41,13 @@ namespace Rackspace.Cloud.Server.Agent.Specs
             _connectionChecker = MockRepository.GenerateMock<IConnectionChecker>();
             _sleeper = MockRepository.GenerateMock<ISleeper>();
             _logger = MockRepository.GenerateMock<ILogger>();
+            _xenToolsUpdateSubActions = MockRepository.GenerateMock<IXenToolsUpdateSubActions>();
             _serviceRestarter = _mockRepo.StrictMock<IServiceRestarter>();
             _agentUpdateMessageHandler = new AgentUpdateMessageHandler();
 
             _logger.Stub(x => x.Log(Arg<string>.Is.Anything));
 
-            _xentoolsUpdate = new XentoolsUpdate(_sleeper, _downloader, _checksumValidator, _unzipper, _installer, _finalizer, _serviceRestarter, _connectionChecker, _agentUpdateMessageHandler, _logger);
+            _xentoolsUpdate = new XentoolsUpdate(_sleeper, _downloader, _checksumValidator, _unzipper, _installer, _finalizer, _serviceRestarter, _connectionChecker, _agentUpdateMessageHandler, _logger, _xenToolsUpdateSubActions);
 
         }
 

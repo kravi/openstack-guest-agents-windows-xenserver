@@ -26,6 +26,7 @@ namespace Rackspace.Cloud.Server.Agent {
         public const string RackspaceRegKey = @"SOFTWARE\Rackspace";
         public const string CloudAutomationSysPrepRegKey = "cloud-automation";
         public const string CloudAutomationKMSActivateRegKey = "cloud-automation-run";
+        public const string XenToolsUpdateSignalKey = "xentools-update-signal";
         
         public const string CloudAutomationCmdPath = @"c:\cloud-automation\bootstrap.cmd";
         public const string CloudAutomationBatPath = @"c:\cloud-automation\bootstrap.bat";
@@ -62,6 +63,7 @@ namespace Rackspace.Cloud.Server.Agent {
         public static readonly string XenToolsReleasePackage = SvcConfiguration.AgentVersionUpdatesPath + "xensetup.exe.zip";
         public static readonly string XenToolsUnzipPath = SvcConfiguration.AgentVersionUpdatesPath + "xentools";
         public static readonly string XenToolsSetupExecutablePath = XenToolsUnzipPath + @"\xensetup.exe";
+        public static readonly string XenToolsSetupScriptPath = XenToolsUnzipPath + @"\install.bat";
 
         public static readonly string UpdaterUnzipPath = SvcConfiguration.AgentVersionUpdatesPath + "updater";
         public static readonly string UpdaterBackupPath = SvcConfiguration.AgentVersionUpdatesPath + "current_updater";
