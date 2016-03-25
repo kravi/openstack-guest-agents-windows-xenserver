@@ -147,7 +147,7 @@ namespace Rackspace.Cloud.Server.Agent.Specs {
             ExecutableProcessQueue.AssertWasCalled(
                 x =>
                 x.Enqueue("netsh",
-                          "interface ipv6 delete address interface=\"Lan1\" address=2001:4801:787F:202:278E:89D8:FF06:B476"));
+                          "interface ipv6 delete address interface=\"Lan1\" address=2001:4801:787F:202:278E:89D8:FF06:B476", new[] { "0", "1" }));
 
 
             ExecutableProcessQueue.AssertWasCalled(
