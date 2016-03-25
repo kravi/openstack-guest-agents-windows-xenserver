@@ -200,11 +200,11 @@ namespace Rackspace.Cloud.Server.Agent.Actions
                 // - Adding an ipv6 interface address and removing it, if not the delete ipv6 address fails with "The system cannot find the file specified."
                 var addAddresscommand = string.Format("interface ipv6 add address interface=\"{0}\" address=1::",
                                             interfaceName);
-                _executableProcessQueue.Enqueue("netsh", addAddresscommand);
+                _executableProcessQueue.Enqueue("netsh", addAddresscommand, new[] { "0", "1" });
 
                 var deleteAddresscommand = string.Format("interface ipv6 delete address interface=\"{0}\" address=1::",
                                             interfaceName);
-                _executableProcessQueue.Enqueue("netsh", deleteAddresscommand);
+                _executableProcessQueue.Enqueue("netsh", deleteAddresscommand, new[] { "0", "1" });
 
                 #endregion
                 // Do the real thing :-)
@@ -212,7 +212,7 @@ namespace Rackspace.Cloud.Server.Agent.Actions
                 string address = ipv6Address.ToString().Split('%')[0].ToUpper();
                 var command = string.Format("interface ipv6 delete address interface=\"{0}\" address={1}",
                                             interfaceName, address);
-                _executableProcessQueue.Enqueue("netsh", command);
+                _executableProcessQueue.Enqueue("netsh", command, new[] { "0", "1" });
             }
             _executableProcessQueue.Enqueue("netsh",
                                             string.Format("interface ipv6 delete route ::/0 \"{0}\"", interfaceName),
